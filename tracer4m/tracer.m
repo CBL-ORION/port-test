@@ -61,5 +61,5 @@ function isOut = tracer( varargin )
 %   log = TraceLogger.getUniqueInstance;
     log.add( caller, name, ID, varargin{2} )
     
-    isOut = false;
+    isOut = true;
 end
