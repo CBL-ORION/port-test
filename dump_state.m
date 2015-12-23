@@ -2,7 +2,7 @@
 function dump_state()
 	call_stack = dbstack('-completenames', 1);
 	assert( ~isempty( call_stack ),...
-		'Non-empty call stack. Called from outside debugger.');
+		'Empty call stack. Called from outside debugger.');
 
 	%% Identify stopping location
 	% 1. function start
