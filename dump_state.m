@@ -74,8 +74,13 @@ function caller_state = dump_state(path_to_output_directory)
 		end
 	end
 
-	input_args
-	output_args
+	%% Save to unique file
+	fname = tempname;
+	[~,fname] = fileparts(fname);
+	full_fname = fullfile( path_to_output_directory, [ fname '.mat' ] );
 
+	full_fname = 'test.mat';
 
+	save( [full_fname '.v7.3'], 'caller_state', '-v7.3' ); % this is HDF5
+	save( [full_fname '.v7'  ], 'caller_state', '-v7' );   % Matlab-specific
 end
