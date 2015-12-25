@@ -1,0 +1,5 @@
+% cd ~/r/code/orion/orion && matlab_nodesk
+addpath('../port-test');
+otrace('external/orion3mat');
+hdaf(3, 5, rand(3,3))
+dump_state('.'), dbcont
