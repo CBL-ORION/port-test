@@ -14,7 +14,7 @@ TEST_OBJ := $(call TEST_PATHSUBST.c,$(TEST.c))
 all:
 	echo "Success!"
 
-dep: | dep.c-tap-harness
+dep: | dep.c-tap-harness dep
 
 dep.c-tap-harness:
 	./tool/external/c-tap-harness/download
@@ -34,3 +34,5 @@ $(BUILDTESTDIR)/%$(EXEEXT): $(TESTDIR)/%.c
 	@$(MKDIR_BUILDTESTDIR)
 	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
+dep.debian:
+	sudo apt-get install --no-install-recommends $$( sed 's/#.*$$//g' < debian-packages )
