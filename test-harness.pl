@@ -107,8 +107,9 @@ SV* process_unimplemented(matvar_t* data) {
 }
 
 SV* process_mat_t_cell(matvar_t* data) {
+	process_unimplemented(data);
+
 	size_t nelems = matio_nelems(data);
-	printf("%d\n", nelems);
 	for( int elem_i = 0; elem_i < nelems; elem_i++ ) {
 		matvar_t* data_elem = ((matvar_t**)(data->data))[elem_i];
 		process_matvar( data_elem );
