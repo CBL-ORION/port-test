@@ -117,6 +117,33 @@ SV* process_mat_t_cell(matvar_t* data) {
 	return NULL; /* TODO */
 }
 
+SV* process_mat_t_struct(matvar_t* data) {
+	size_t nelems = matio_nelems(data);
+	size_t nfields = Mat_VarGetNumberOfFields(data);
+	char* const* field_names = Mat_VarGetStructFieldnames(data);
+
+	AV* av_of_structs;
+	SV* ref_av_of_structs;
+
+	av_of_structs = newAV();
+	size_t data_i = 0;
+	for( int elem_i = 0; elem_i < nelems; elem_i++ ) {
+		HV* hv_struct = newHV();
+		for( int field_i = 0; field_i < nfields; field_i++) {
+			matvar_t* data_elem = ((matvar_t**)(data->data))[data_i];
+			char* key = field_names[field_i];
+			SV* val = process_matvar( data_elem );
+			hv_store(hv_struct, key, strlen(key), val, 0);
+			data_i++;
+		}
+		av_push(av_of_structs, newRV((SV*)hv_struct));
+	}
+	ref_av_of_structs = newRV((SV*)av_of_structs);
+	return ref_av_of_structs;
+}
+
+
+
 size_t matio_nelems(matvar_t* data) {
 	size_t nelems = 1;
 	for( int rank_i = 0; rank_i < data->rank; rank_i++ ) {
