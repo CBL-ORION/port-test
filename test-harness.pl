@@ -28,6 +28,9 @@ SV* process_mat_t_cell(matvar_t* data);
 SV* process_unimplemented(matvar_t* data);
 size_t matio_nelems(matvar_t* data);
 SV* process_matvar( matvar_t* data );
+SV* process_mat_t_struct(matvar_t* data);
+SV* process_mat_c_double(matvar_t* data);
+SV* process_mat_c_char(matvar_t* data);
 
 SV* show_variables( char* filename ) {
 	mat_t *matfp; /* used to open file r/o */
@@ -52,15 +55,16 @@ SV* show_variables( char* filename ) {
 }
 
 SV* process_matvar( matvar_t* data ) {
+	/*DEBUG*/matio_dump_info(data);
 	/* switch over `enum matio_classes` */
 	switch( data->class_type ) {
 		case MAT_C_EMPTY:     return process_unimplemented(data);
 		case MAT_C_CELL:      return process_mat_t_cell(data);
-		case MAT_C_STRUCT:    return process_unimplemented(data);
+		case MAT_C_STRUCT:    return process_mat_t_struct(data);
 		case MAT_C_OBJECT:    return process_unimplemented(data);
-		case MAT_C_CHAR:      return process_unimplemented(data);
+		case MAT_C_CHAR:      return process_mat_c_char(data);
 		case MAT_C_SPARSE:    return process_unimplemented(data);
-		case MAT_C_DOUBLE:    return process_unimplemented(data);
+		case MAT_C_DOUBLE:    return process_mat_c_double(data);
 		case MAT_C_SINGLE:    return process_unimplemented(data);
 		case MAT_C_INT8:      return process_unimplemented(data);
 		case MAT_C_UINT8:     return process_unimplemented(data);
