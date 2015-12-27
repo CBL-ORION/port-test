@@ -1,0 +1,13 @@
+matio
+	/usr/include/matio.h
+	external/matio/matio/documentation/
+
+tracing
+	notes on set up
+		run
+	set up tracing
+		otrace.m
+	dump state
+		dump_state.m
+	control the MATLAB debugger
+		orion-control.pl
