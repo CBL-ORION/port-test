@@ -10,7 +10,10 @@ use Inline C => 'DATA',
 	LIBS => `pkg-config --libs matio`,
 	with => 'PDL';
 
-show_variables( '../orion/test.mat.v7' );
+my $p = show_variables( '../orion/test.mat.v7' );
+
+#use Data::Dumper; print Dumper($p);
+use DDP; p $p;
 
 __END__
 __C__
