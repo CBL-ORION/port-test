@@ -1,0 +1,11 @@
+#!/bin/sh
+
+CURDIR=`dirname "$0"`
+cd "$CURDIR/../../.."
+[ -d external -o -L external ] || mkdir external
+cd external/ || ( echo "Need external/ symlink/directory" && exit )
+mkdir -p matio; cd matio
+
+if [ ! -d "matio" ]; then
+	git clone git@github.com:CBL-ORION/matio-sf-mirror.git matio
+fi
