@@ -195,6 +195,7 @@ void matio_dump_info( matvar_t* data ) {
 		matio_class_to_char(data->class_type));
 
 	/* print the size */
+	fprintf(stderr, "\tdata size: %d\n", data->data_size);
 	fprintf(stderr, "\trank: %d", data->rank);
 	fprintf(stderr, " dims: [ ");
 	for( int rank_i = 0; rank_i < data->rank; rank_i++ ) {
