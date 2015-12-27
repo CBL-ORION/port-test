@@ -41,17 +41,20 @@ SV* show_variables( char* filename ) {
 		croak("Error opening MAT file \"%s\"!\n", filename);
 	}
 
-	while ( (matvar = Mat_VarReadNextInfo(matfp)) != NULL ) {
-		matio_dump_info(matvar);
-		process_matvar( matvar );
+	HV* workspace = newHV();
+	SV* ref_workspace;
+	while ( (matvar = Mat_VarReadNext(matfp)) != NULL ) {
+		char* key = matvar->name;
+		SV* val = process_matvar( matvar );
+		hv_store(workspace, key, strlen(key), val, 0);
 		Mat_VarFree(matvar);
 		matvar = NULL;
 	}
-
+	ref_workspace = newRV((SV*)workspace);
 
 	Mat_Close(matfp);
 
-	return NULL;
+	return ref_workspace;
 }
 
 SV* process_matvar( matvar_t* data ) {
