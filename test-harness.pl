@@ -7,7 +7,8 @@ use PDL;
 
 use Inline C => 'DATA',
 	INC => `pkg-config --cflags matio`,
-	LIBS => `pkg-config --libs matio`,;
+	LIBS => `pkg-config --libs matio`,
+	with => 'PDL';
 
 show_variables( '../orion/test.mat.v7' );
 
@@ -15,6 +16,7 @@ __END__
 __C__
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 #include "matio.h"
 
@@ -115,6 +117,23 @@ SV* process_mat_t_cell(matvar_t* data) {
 		process_matvar( data_elem );
 	}
 	return NULL; /* TODO */
+}
+
+SV* process_mat_c_double(matvar_t* data) {
+	pdl* p;
+	SV* rv;
+
+	p = PDL->pdlnew();
+	PDL->setdims(p, data->dims, data->rank);
+	p->datatype = PDL_D;
+	PDL->allocdata(p);
+	memcpy(p->data, data->data, data->nbytes);
+
+	/* store in SV */
+	rv = newSV(0);
+	PDL->SetSV_PDL(rv, p);
+
+	return rv;
 }
 
 SV* process_mat_t_struct(matvar_t* data) {
