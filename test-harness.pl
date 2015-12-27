@@ -136,6 +136,20 @@ SV* process_mat_c_double(matvar_t* data) {
 	return rv;
 }
 
+SV* process_mat_c_char(matvar_t* data) {
+	SV* rv;
+	if( data->rank == 2 && data->dims[0] == 1 ) {
+		/* convert to a string stored in a scalar */
+		rv = newSVpv( (char*)(data->data), data->dims[1] );
+	} else {
+		croak("TODO implement PDL::Char array");
+	}
+
+	return rv;
+}
+
+
+
 SV* process_mat_t_struct(matvar_t* data) {
 	size_t nelems = matio_nelems(data);
 	size_t nfields = Mat_VarGetNumberOfFields(data);
