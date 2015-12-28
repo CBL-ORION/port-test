@@ -29,7 +29,7 @@ SV* process_mat_t_struct(matvar_t* data);
 SV* process_mat_c_double(matvar_t* data);
 SV* process_mat_c_char(matvar_t* data);
 
-SV* show_variables( char* filename ) {
+SV* read_data(SV* self, char* filename ) {
 	mat_t *matfp; /* used to open file r/o */
 	matvar_t *matvar; /* used to iterate over variables */
 
