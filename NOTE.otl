@@ -1,6 +1,9 @@
 matio
 	/usr/include/matio.h
 	external/matio/matio/documentation/
+	~/perl5/perlbrew/perls/perl-5.18.1/lib/site_perl/5.18.1/x86_64-linux/PDL/Core/typemap.pdl
+	PDL typemap
+		perl -MPDL -E 'say (PDL->Inline("C")->{TYPEMAPS}[0])'
 
 tracing
 	notes on set up
