@@ -14,7 +14,10 @@ TEST_OBJ := $(call TEST_PATHSUBST.c,$(TEST.c))
 all:
 	echo "Success!"
 
-dep: | dep.c-tap-harness dep
+dep: | dep.c-tap-harness dep dep.perl
+
+dep.perl:
+	cpanm --installdeps .
 
 dep.c-tap-harness:
 	./tool/external/c-tap-harness/download
