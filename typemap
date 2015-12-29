@@ -1,0 +1,32 @@
+TYPEMAP
+
+ndarray3* T_NDARRAY3
+
+
+INPUT
+
+T_NDARRAY3
+	# need to wrap the PDL data field using ndarray3_wrap
+	pdl* p_${argoff}_in = PDL->SvPDLV($arg);
+	if( PDL_F != p_${argoff}_in->datatype )
+		croak(\"Can not use typemap! PDL does not contain float data (datatype: %d)\", p_${argoff}_in->datatype);
+	if( 3 != p_${argoff}_in->ndims )
+		croak(\"Can not use PDL data! The input is not rank 3 (rank: %d)\", p_${argoff}_in->ndims);
+	$var = ndarray3_wrap( (float*)(p_${argoff}_in->data),
+		p_${argoff}_in->dims[0],
+		p_${argoff}_in->dims[1],
+		p_${argoff}_in->dims[2] );
+
+OUTPUT
+
+T_NDARRAY3
+	/* need to wrap ndarray3 data field in a PDL structure -> SV* */
+	pdl* p_out = PDL->pdlnew();
+	PDL->setdims(p_out, ((ndarray3*)$var)->sz, 3); /* rank 3 */
+	p_out->data = ((ndarray3*)$var)->p; /* point at the ndarray3 data */
+	p_out->datatype = PDL_F; /* using float (pixel_type) for storage */
+
+	/* make sure the core doesn't meddle with your data */
+	p_out->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+
+	PDL->SetSV_PDL($arg,p_out);
