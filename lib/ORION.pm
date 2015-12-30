@@ -3,6 +3,7 @@ package ORION;
 use strict;
 use warnings;
 
+use PDL;
 use Path::Tiny;
 use Hash::Merge;
 

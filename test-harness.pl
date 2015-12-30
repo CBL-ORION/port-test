@@ -16,7 +16,7 @@ use ORION;
 
 use Inline C => 'DATA',
 	ENABLE => AUTOWRAP =>
-	with => ['ORION']
+	with => ['ORION'],
 	;
 
 #my $p = Data::MATLAB->read_data( '../orion/test.mat.v7' );
