@@ -18,7 +18,7 @@ script:
   - if [ "$CC" = "clang" ]; then export CXX="clang++"; fi
   - if [ "$CC" = "gcc" ]; then export BUILD_ENABLE_ASAN=0; else export BUILD_ENABLE_ASAN=1; fi
   - ./build-liborion
-  - sudo make dep.perl
+  - sudo cpanm --notest --installdeps .
   - prove -lvr t
 branches:
   except:
