@@ -10,8 +10,9 @@ before_install:
   - sudo apt-get install libmatio-dev
   - sudo apt-get build-dep pdl
   - curl -L https://cpanmin.us | perl - --sudo App::cpanminus
-  - sudo cpanm --notest PDL
+  - sudo cpanm --notest PDL || true
   - sudo cpanm --notest --installdeps . || true
+  - sudo cpanm --notest PDL
   - git clone https://github.com/CBL-ORION/ITK-builds.git external/ITK
   # path for CMake to search for built ITK
   - export ITK_DIR="`( cd external/ITK/usr/local/lib/cmake/ITK-4.9 && pwd )`"
