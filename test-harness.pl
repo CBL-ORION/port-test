@@ -7,19 +7,17 @@ use v5.16;
 use lib 'lib';
 use PDL;
 use Data::MATLAB;
+use ORION;
 
 #use Inline Config =>
 	#enable => force_build =>
 	#enable => build_noisy =>
 	#disable => clean_after_build =>;
 
-use FindBin;
 use Inline C => 'DATA',
 	ENABLE => AUTOWRAP =>
-	INC => "-I$FindBin::Bin/orion/lib",
-	LIBS => "-L$FindBin::Bin/orion/.build/.lib -lorion",
-	with => ['PDL'],
-	TYPEMAPS => 'typemap';
+	with => ['ORION']
+	;
 
 #my $p = Data::MATLAB->read_data( '../orion/test.mat.v7' );
 #use DDP; p $p;
