@@ -1,4 +1,4 @@
-use Test::More;
+use Test::Most tests => 2;
 
 use PDL;
 use ORION;
@@ -9,7 +9,10 @@ use Inline C => 'DATA',
 
 my $n_got = get_sequence();
 
-ok( all($n_got == sequence(3, 4, 5)), 'PDL has correct data dimensions and contents' );
+subtest "PDL test" => sub {
+	ok( all($n_got == sequence(3, 4, 5)), 'PDL has correct data dimensions and contents' );
+	is_deeply($n_got->hdr->{spacing}, [2, 3, 5], 'got expected spacing in PDL header');
+};
 
 ok( expected_ndarray3($n_got), 'expected round-trip back to ndarray3' );
 
