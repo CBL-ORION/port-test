@@ -8,6 +8,7 @@ compiler:
 before_install:
   - sudo apt-get update
   - sudo apt-get install libmatio-dev pdl libinline-perl
+  - sudo apt-get build-dep pdl
   - curl -L https://cpanmin.us | perl - --sudo App::cpanminus
   - git clone https://github.com/CBL-ORION/ITK-builds.git external/ITK
   # path for CMake to search for built ITK
