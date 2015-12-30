@@ -28,7 +28,7 @@ sub Inline {
 	# make each value an arrayref so that the arrayrefs are concatenated
 	# when merging
 	my $config = {
-		INC => ["-I@{[ oriondir()->child('lib') ]}"],
+		INC => [ "-std=c99", "-I@{[ oriondir()->child('lib') ]}"],
 		LIBS => [ "-L@{[ oriondir()->child( qw{.build .lib} ) ]} -lorion" ],
 		TYPEMAPS => [ "@{[ path(__FILE__)->absolute->parent->child( qw{ORION typemap} ) ]}" ],
 	};
