@@ -3,4 +3,4 @@ set -e
 
 git clone https://github.com/CBL-ORION/orion.git -b segmentation
 export CFLAGS="$CFLAGS -fPIC"
-cd orion && make dep.external all PROD=1
+cd orion && make dep.external all PROD=1 BUILD_ENABLE_ASAN=0
