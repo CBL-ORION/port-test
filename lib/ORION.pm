@@ -8,6 +8,7 @@ use Path::Tiny;
 use Hash::Merge;
 use Path::Iterator::Rule;
 use Parse::RecDescent;
+use Data::MATLAB;
 
 sub basedir {
 	my $file = path(__FILE__)->absolute;
@@ -24,6 +25,11 @@ sub oriondir {
 sub orionmatdir {
 	my $base_dir = basedir();
 	$base_dir->child( qw{ external orionmat });
+}
+
+sub datadir {
+	my $base_dir = basedir();
+	$base_dir->child('data');
 }
 
 sub Inline {
@@ -67,20 +73,30 @@ sub c_functions {
 		$parser->{data}{file} = $file;
 		$parser->code( $code ) or die "could not parse file $file";
 		use DDP; p $parser->{data};
-		#my $cAstObject = MarpaX::Languages::C::AST->new( lazy => 1 );
-		#my $r = $cAstObject->parse(\$code);
+
+		# TODO create C function object
 	}
 
 }
 
 sub matlab_functions {
 	# get all the .h files under lib/
-	my $m_file_rule = Path::Iterator::Rule->new
-		->file->name( qr/\.m$/ );
-	my $m_file_iter = $m_file_rule->iter( ORION->orionmatdir );
-	while( defined( my $file = $m_file_iter->() ) ) {
-		print "$file\n";
+	my $matlab_func_mat_file = ORION->datadir->child('matlab_func.mat');
+
+	my $matlab_source = ORION->basedir->child(qw(src matlab));
+	my $project = ORION->orionmatdir;
+
+	unless( -r $matlab_func_mat_file ) {
+		my $EXEC = join ",", (
+			"addpath('$matlab_source')",
+			"parse_project_matlab_funcs('$project', '$matlab_func_mat_file')",
+			"exit"
+		);
+		system( qw(matlab -nodesktop -nodisplay -nojvm -nosplash),
+			'-r', $EXEC );
 	}
+	my $data = Data::MATLAB->read_data( $matlab_func_mat_file );
+	use DDP; p $data;
 }
 
 sub c_grammar {

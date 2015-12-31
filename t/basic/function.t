@@ -4,6 +4,6 @@ use ORION;
 
 ORION->c_functions;
 
-#ORION->matlab_functions;
+ORION->matlab_functions;
 
 done_testing;
