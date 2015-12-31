@@ -113,14 +113,19 @@ SV* process_unimplemented(matvar_t* data) {
 }
 
 SV* process_mat_t_cell(matvar_t* data) {
-	process_unimplemented(data);
+	AV* av_of_cells;
+	SV* ref_av_of_cells;
 
+	av_of_cells = newAV();
 	size_t nelems = matio_nelems(data);
 	for( int elem_i = 0; elem_i < nelems; elem_i++ ) {
 		matvar_t* data_elem = ((matvar_t**)(data->data))[elem_i];
-		process_matvar( data_elem );
+		SV* sv_cell = process_matvar( data_elem );
+		av_push(av_of_cells, sv_cell);
 	}
-	return NULL; /* TODO */
+	ref_av_of_cells = newRV_noinc((SV*)av_of_cells);
+
+	return ref_av_of_cells;
 }
 
 SV* process_mat_c_double(matvar_t* data) {
