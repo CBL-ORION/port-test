@@ -19,10 +19,14 @@ use Inline C => 'DATA',
 	with => ['ORION'],
 	;
 
-#my $p = Data::MATLAB->read_data( '../orion/test.mat.v7' );
-#use DDP; p $p;
+my $p = Data::MATLAB->read_data( '../orion/test.mat.v7' );
+use DDP; p $p;
 
-my $q = orion_hdaf(3, 5, sequence(float, 3,3,3));
+my $SZ = 5;
+my $factor = 0.25;
+my $nd = ndcoords(float, $SZ-1,$SZ,$SZ+1);
+#my $q = orion_hdaf(3, 5, sequence(float, 5,5,5));
+my $q = orion_hdaf(3, 5, (( 0.25* $nd)**2)->sumover->sqrt->float );
 use DDP; p $q;
 
 __DATA__
