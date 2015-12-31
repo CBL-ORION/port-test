@@ -47,7 +47,7 @@ SV* read_data(SV* self, char* filename ) {
 		Mat_VarFree(matvar);
 		matvar = NULL;
 	}
-	ref_workspace = newRV((SV*)workspace);
+	ref_workspace = newRV_noinc((SV*)workspace);
 
 	Mat_Close(matfp);
 
@@ -55,7 +55,7 @@ SV* read_data(SV* self, char* filename ) {
 }
 
 SV* process_matvar( matvar_t* data ) {
-	/*DEBUG*/matio_dump_info(data);
+	/*[>DEBUG<]matio_dump_info(data);*/
 	/* switch over `enum matio_classes` */
 	switch( data->class_type ) {
 		case MAT_C_EMPTY:     return process_unimplemented(data);
@@ -173,9 +173,9 @@ SV* process_mat_t_struct(matvar_t* data) {
 			hv_store(hv_struct, key, strlen(key), val, 0);
 			data_i++;
 		}
-		av_push(av_of_structs, newRV((SV*)hv_struct));
+		av_push(av_of_structs, newRV_noinc((SV*)hv_struct));
 	}
-	ref_av_of_structs = newRV((SV*)av_of_structs);
+	ref_av_of_structs = newRV_noinc((SV*)av_of_structs);
 	return ref_av_of_structs;
 }
 
