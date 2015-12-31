@@ -35,7 +35,14 @@ sub Inline {
 	# make each value an arrayref so that the arrayrefs are concatenated
 	# when merging
 	my $config = {
-		INC => [ "-std=c99", "-I@{[ oriondir()->child('lib') ]}"],
+		AUTO_INCLUDE => [ <<C ],
+#include "orion_util.c"
+C
+		INC => [
+			"-std=c99",
+			"-I@{[ oriondir()->child('lib') ]}",
+			"-I@{[ path(__FILE__)->absolute->parent->child( qw{ORION} ) ]}",
+		],
 		LIBS => [ "-L@{[ oriondir()->child( qw{.build .lib} ) ]} -lorion" ],
 		TYPEMAPS => [ "@{[ path(__FILE__)->absolute->parent->child( qw{ORION typemap} ) ]}" ],
 	};
@@ -43,6 +50,7 @@ sub Inline {
 	my $merged_config = Hash::Merge::merge($config, $pdl_config);
 	# the INC value must be a scalar so join array
 	$merged_config->{INC} = join " ", @{ $merged_config->{INC} };
+	$merged_config->{AUTO_INCLUDE} = join "\n", reverse @{ $merged_config->{AUTO_INCLUDE} };
 
 	return $merged_config;
 }
