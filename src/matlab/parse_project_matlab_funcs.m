@@ -5,11 +5,10 @@ m_funcs = get_project_matlab_funcs(path_to_project);
 
 %m_funcs
 
-func_data = struct();
-
-func_data.name = {};
-func_data.input_param = {};
-func_data.output_param = {};
+func_data = struct(...
+	'name', {},...
+	'input_param', {},...
+	'output_param', {});
 
 skipped = {};
 
@@ -22,7 +21,7 @@ for m_funcs_i = 1:size( m_funcs, 1 )
 
 	try
 		[input_param, output_param] = get_arg_names(current_func.name);
-	catch
+	catch ME
 		skipped = [ skipped, current_func.name ];
 		continue
 	end
