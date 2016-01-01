@@ -4,3 +4,5 @@ set -e
 git clone https://github.com/CBL-ORION/orion.git -b segmentation
 export CFLAGS="$CFLAGS -fPIC"
 cd orion && make dep.test-data dep.external all PROD=1 BUILD_ENABLE_ASAN=0 "$@"
+make test-data/DIADEM/NPF/NPF023/NPF023.raw # extract
+find test-data/ -name "*.txt" -exec sed -i 's|^test-data/|orion/&|' {} \;

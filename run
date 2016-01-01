@@ -3,3 +3,9 @@ addpath('../port-test/src/matlab');
 otrace('external/orion3mat');
 hdaf(3, 5, rand(3,3))
 dump_state('.'), dbcont
+
+
+cd ~/r/code/orion/port-test
+!cd ~/r/code/orion/port-test/orion && make test-data/DIADEM/NPF/NPF023/NPF023.raw
+addpath('src/matlab'), otrace('external/orionmat', 'ORION3(''orion/test-data/DIADEM/NPF/Input_NPF023_D.txt'')')
+dump_state('data/debug-trace'), dbcont
