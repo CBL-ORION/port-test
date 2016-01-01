@@ -22,8 +22,11 @@ function caller_state = dump_state(path_to_output_directory)
 	current_func = call_stack(1);
 
 	% Get breakpoints for current file
-	current_file_bps = dbstatus( current_func.file );
-	bps_idx_for_current_function =  find(ismember( { current_file_bps.name }, current_func.name ));
+	current_file_bps = dbstatus('-completenames', current_func.file );
+	% need to get only the function name
+	% e.g, not '/path/to/function.m>subfunction'
+	bps_short_names = regexprep( { current_file_bps.name }, '^.*>(?<fname>[^>]*)$', '$<fname>' )
+	bps_idx_for_current_function =  find(ismember( bps_short_names, current_func.name ));
 	current_file_bps = current_file_bps(bps_idx_for_current_function);
 
 	bp_for_current_line = find(current_file_bps.line == current_func.line);

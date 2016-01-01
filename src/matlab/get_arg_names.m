@@ -1,5 +1,7 @@
 % From <http://stackoverflow.com/questions/10431577/how-do-i-retrieve-the-names-of-function-parameters-in-matlab>,
 % <http://stackoverflow.com/a/10746936>
+%
+% NOTE: this does not work for subfunctions since it needs to open the whole function file.
 function [inputNames,outputNames] = get_arg_names(functionFile)
     %# get some random file name
     tmp_folder = tempdir;

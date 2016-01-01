@@ -113,7 +113,10 @@ classdef ( Sealed )  TraceHistory < handle
                                 ,   'at',   s.Range{1,2}                    ...
                                 ,   'if',   'tracer( ''M'', ''end''   )'    )
                             
-                        case { 'Main', 'Sub', 'Nested' }
+                        case { 'Sub', 'Nested' }
+			% NOTE: We only want to trace the main function, not
+			% subfunctions or nested functions, so skip this.
+                        case { 'Main' }
 
                             dbstop( 'in',   s.Name{1}                       ...
                                 ,   'at',   s.Name{2}                       ...
