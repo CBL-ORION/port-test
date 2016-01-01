@@ -27,6 +27,10 @@ sub orionmatdir {
 	$base_dir->child( qw{ external orionmat });
 }
 
+sub matlabsrcdir {
+	my $matlab_source = ORION->basedir->child(qw(src matlab));
+}
+
 sub datadir {
 	my $base_dir = basedir();
 	$base_dir->child('data');
@@ -83,7 +87,7 @@ sub matlab_functions {
 	# get all the .h files under lib/
 	my $matlab_func_mat_file = ORION->datadir->child('matlab_func.mat');
 
-	my $matlab_source = ORION->basedir->child(qw(src matlab));
+	my $matlab_source = ORION->matlabsrcdir;
 	my $project = ORION->orionmatdir;
 
 	unless( -r $matlab_func_mat_file ) {
