@@ -23,6 +23,9 @@ function caller_state = dump_state(path_to_output_directory)
 
 	% Get breakpoints for current file
 	current_file_bps = dbstatus( current_func.file );
+	bps_idx_for_current_function =  find(ismember( { current_file_bps.name }, current_func.name ));
+	current_file_bps = current_file_bps(bps_idx_for_current_function);
+
 	bp_for_current_line = find(current_file_bps.line == current_func.line);
 	if numel( bp_for_current_line ) ~= 1
 		error( 'Found %d breakpoints for %s:%d when expecting 1',...
@@ -30,6 +33,9 @@ function caller_state = dump_state(path_to_output_directory)
 				current_func.file,...
 				current_func.line );
 	end
+
+	caller_state.NAME = current_func.name;
+	caller_state.LINE = current_func.line;
 
 	%% Identify stopping location
 	% 1. function start
@@ -79,8 +85,5 @@ function caller_state = dump_state(path_to_output_directory)
 	[~,fname] = fileparts(fname);
 	full_fname = fullfile( path_to_output_directory, [ fname '.mat' ] );
 
-	full_fname = 'test.mat';
-
-	save( [full_fname '.v7.3'], 'caller_state', '-v7.3' ); % this is HDF5
 	save( [full_fname '.v7'  ], 'caller_state', '-v7' );   % Matlab-specific
 end

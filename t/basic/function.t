@@ -10,6 +10,6 @@ plan tests => 1;
 
 ORION->c_functions;
 
-ORION->matlab_functions;
+#ORION->matlab_functions;
 
 done_testing;
