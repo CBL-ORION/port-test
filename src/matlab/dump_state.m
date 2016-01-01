@@ -38,6 +38,7 @@ function caller_state = dump_state(path_to_output_directory)
 	end
 
 	caller_state.NAME = current_func.name;
+	caller_state.FILE = current_func.file;
 	caller_state.LINE = current_func.line;
 
 	%% Identify stopping location
