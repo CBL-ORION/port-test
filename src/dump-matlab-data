@@ -1,0 +1,3 @@
+#!/bin/sh
+
+perl -Ilib -MData::MATLAB -MDDP -MPDL -E 'use DDP; my $d = Data::MATLAB->read_data($ARGV[0]); p $d' "$@";
