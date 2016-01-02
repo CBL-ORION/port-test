@@ -5,8 +5,13 @@ function caller_state = dump_state(path_to_output_directory)
 %
 % Note:
 %  - This function can only be used when in debug mode.
+	persistent otrace_stack;
+	if isempty(otrace_stack)
+		% empty struct at start
+		otrace_stack = struct('name', {}, 'id', {});
+	end
 
-	% where the output will be stored
+	% where the output for this particular function will be stored
 	caller_state = struct();
 	caller_state.TIME = cputime;
 
@@ -25,7 +30,7 @@ function caller_state = dump_state(path_to_output_directory)
 	current_file_bps = dbstatus('-completenames', current_func.file );
 	% need to get only the function name
 	% e.g, not '/path/to/function.m>subfunction'
-	bps_short_names = regexprep( { current_file_bps.name }, '^.*>(?<fname>[^>]*)$', '$<fname>' )
+	bps_short_names = regexprep( { current_file_bps.name }, '^.*>(?<fname>[^>]*)$', '$<fname>' );
 	bps_idx_for_current_function =  find(ismember( bps_short_names, current_func.name ));
 	current_file_bps = current_file_bps(bps_idx_for_current_function);
 
@@ -40,6 +45,14 @@ function caller_state = dump_state(path_to_output_directory)
 	caller_state.NAME = current_func.name;
 	caller_state.FILE = current_func.file;
 	caller_state.LINE = current_func.line;
+
+	%% Stack info
+
+	caller_state.STACKID = gen_guid()
+
+	current_stack_info = struct(...
+		'name', caller_state.NAME,...
+		'id', caller_state.STACKID);
 
 	%% Identify stopping location
 	% 1. function start
@@ -63,7 +76,12 @@ function caller_state = dump_state(path_to_output_directory)
 	% that will add another function to the call stack and then
 	% evalin('caller', ...) will no longer work.
 	if strcmp( caller_state.WHERE, 'F_BEGIN' )
+		% push current state on to stack
+		otrace_stack = [ otrace_stack, current_stack_info ];
+		caller_state.STACK = otrace_stack;
+
 		caller_state.input = struct();
+		input_args
 		for input_args_i = 1:length(input_args)
 			cur_input_arg = input_args{input_args_i};
 			caller_state.input = setfield(...
@@ -73,6 +91,10 @@ function caller_state = dump_state(path_to_output_directory)
 			);
 		end
 	elseif strcmp( caller_state.WHERE, 'F_END' )
+		caller_state.STACK = otrace_stack;
+		otrace_stack = otrace_stack(1:end-1); % pop off stack
+
+
 		caller_state.output = struct();
 		for output_args_i = 1:length(output_args)
 			cur_output_arg = output_args{output_args_i};
@@ -83,11 +105,15 @@ function caller_state = dump_state(path_to_output_directory)
 			);
 		end
 	end
+	struct2cell(otrace_stack)
 
 	%% Save to unique file
-	fname = tempname;
-	[~,fname] = fileparts(fname);
-	full_fname = fullfile( path_to_output_directory, [ fname '.mat' ] );
+	% TODO give filename based on function name and stack ID
+	fname = sprintf('%s.%s.%s.mat',...
+		caller_state.NAME,...
+		caller_state.WHERE,...
+		caller_state.STACKID);
+	full_fname = fullfile( path_to_output_directory, fname );
 
-	save( [full_fname '.v7'  ], 'caller_state', '-v7' );   % Matlab-specific
+	save( full_fname, 'caller_state', '-v7' );   % Matlab-specific
 end
