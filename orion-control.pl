@@ -29,4 +29,10 @@ $command->debug( 2 );
 
 while ( $command->expect(undef, '>>' ) ) {
 	say $command "dump_state('$debug_trace_dir'), dbcont";
+
+	# exit on error
+	last if $command->before =~ /Error/;
 }
+
+# allow for interaction to investigate why loop stopped
+$command->interact;
