@@ -96,7 +96,7 @@ sub matlab_functions {
 			"parse_project_matlab_funcs('$project', '$matlab_func_mat_file')",
 			"exit"
 		);
-		system( qw(matlab -nodesktop -nodisplay -nojvm -nosplash),
+		system( qw(matlab -nodesktop -nodisplay -nosplash),
 			'-r', $EXEC );
 	}
 	my $data = Data::MATLAB->read_data( $matlab_func_mat_file );

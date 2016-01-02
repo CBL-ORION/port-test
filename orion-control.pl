@@ -5,7 +5,9 @@ use warnings;
 
 use Expect;
 
-my $command = Expect->spawn("matlab", qw(-nosplash -nodesktop -nojvm))
+# NOTE: We need MATLAB + JVM so that `gen_guid` and `tempname` works, so we do
+# not use `-nojvm` here.
+my $command = Expect->spawn("matlab", qw(-nodesktop -nodisplay -nosplash))
 	or die "Couldn't start program: $!\n";
 
 
