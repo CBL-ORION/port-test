@@ -27,6 +27,7 @@ size_t matio_nelems(matvar_t* data);
 SV* process_matvar( matvar_t* data );
 SV* process_mat_t_struct(matvar_t* data);
 SV* process_mat_c_double(matvar_t* data);
+SV* process_mat_c_uint8(matvar_t* data);
 SV* process_mat_c_char(matvar_t* data);
 
 SV* read_data(SV* self, char* filename ) {
@@ -67,7 +68,7 @@ SV* process_matvar( matvar_t* data ) {
 		case MAT_C_DOUBLE:    return process_mat_c_double(data);
 		case MAT_C_SINGLE:    return process_unimplemented(data);
 		case MAT_C_INT8:      return process_unimplemented(data);
-		case MAT_C_UINT8:     return process_unimplemented(data);
+		case MAT_C_UINT8:     return process_mat_c_uint8(data);
 		case MAT_C_INT16:     return process_unimplemented(data);
 		case MAT_C_UINT16:    return process_unimplemented(data);
 		case MAT_C_INT32:     return process_unimplemented(data);
@@ -128,13 +129,13 @@ SV* process_mat_t_cell(matvar_t* data) {
 	return ref_av_of_cells;
 }
 
-SV* process_mat_c_double(matvar_t* data) {
+SV* matvar_t_to_pdl(matvar_t* data, int datatype) {
 	pdl* p;
 	SV* rv;
 
 	p = PDL->pdlnew();
 	PDL->setdims(p, data->dims, data->rank);
-	p->datatype = PDL_D;
+	p->datatype = datatype;
 	PDL->allocdata(p);
 	memcpy(p->data, data->data, data->nbytes);
 
@@ -143,7 +144,18 @@ SV* process_mat_c_double(matvar_t* data) {
 	PDL->SetSV_PDL(rv, p);
 
 	return rv;
+
 }
+
+SV* process_mat_c_double(matvar_t* data) {
+	return matvar_t_to_pdl(data, PDL_D);
+}
+
+SV* process_mat_c_uint8(matvar_t* data) {
+	return matvar_t_to_pdl(data, PDL_B);
+}
+
+
 
 SV* process_mat_c_char(matvar_t* data) {
 	SV* rv;
