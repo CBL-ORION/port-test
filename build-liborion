@@ -1,8 +1,9 @@
 #!/bin/sh
 set -e
 
-git clone https://github.com/CBL-ORION/orion.git -b segmentation
+[ -d "orion" ] || git clone https://github.com/CBL-ORION/orion.git -b segmentation
 export CFLAGS="$CFLAGS -fPIC"
-cd orion && make dep.test-data dep.external all PROD=1 BUILD_ENABLE_ASAN=0 "$@"
+cd orion && make dep.external all PROD=1 BUILD_ENABLE_ASAN=0 "$@"
+[ -d test-data ] || make dep.test-data
 make test-data/DIADEM/NPF/NPF023/NPF023.raw # extract
 find test-data/ -name "*.txt" -exec sed -i 's|^test-data/|orion/&|' {} \;
