@@ -1,5 +1,6 @@
 requires 'Test::Most';
 requires 'Data::Printer'; # needed to dump output .mat file contents
+requires 'Capture::Tiny';
 
 # handling data
 requires 'PDL', '2.008';
