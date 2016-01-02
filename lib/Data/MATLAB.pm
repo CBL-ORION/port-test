@@ -18,6 +18,14 @@ __C__
 #include <stdbool.h>
 #include "matio.h"
 
+/* Older versions of libmatio do not have the `MAT_C_EMPTY` symbol. Instead of
+ * commenting out it entirely in the code below, define it to be a negative
+ * value to avoid conflict with other values in the `matio_classes` enum.
+ */
+#ifndef MAT_C_EMPTY
+#define MAT_C_EMPTY -1
+#endif /* MAT_C_EMPTY */
+
 /* function prototypes */
 const char* matio_class_to_char( enum matio_classes ct );
 inline const char* matio_bool_to_char(bool p);
