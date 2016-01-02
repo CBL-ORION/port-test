@@ -6,6 +6,7 @@ use warnings;
 use Data::MATLAB::InlineMatio;
 
 use Inline C => 'DATA',
+	INC => '-std=c99',
 	with => ['Data::MATLAB::InlineMatio', 'PDL'];
 
 1;
