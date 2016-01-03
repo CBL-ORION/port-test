@@ -10,7 +10,7 @@ for dir_i = 1:length(all_dir)
 	m_files = [m_files; m_files_in_dir.m];
 end
 
-m_funcs = cell(length(m_files));
+m_funcs = cell(length(m_files), 1);
 for m_files_i = 1:length( m_files )
 	m_funcs{m_files_i} = regexprep(m_files{m_files_i} , '\.m$' , '');
 	%disp( [m_files{m_files_i} ' -> ' m_funcs{m_files_i}]  );%DEBUG
