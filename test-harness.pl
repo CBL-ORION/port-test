@@ -8,6 +8,7 @@ use lib 'lib';
 use PDL;
 use Data::MATLAB;
 use ORION;
+use ORION::FunctionStateFile;
 
 #use Inline Config =>
 	#enable => force_build =>
@@ -19,29 +20,41 @@ use Inline C => 'DATA',
 	with => ['ORION'],
 	;
 
-my $p_input = Data::MATLAB->read_data( 'data/debug-trace/hdaf.F_BEGIN.32b30b3b-e2a9-4c04-8cc1-68086684c815.mat' );
-my $p_output = Data::MATLAB->read_data( 'data/debug-trace/hdaf.F_END.32b30b3b-e2a9-4c04-8cc1-68086684c815.mat' );
-#use DDP; p $p_input;
-#use DDP; p $p_output;
+my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
+my $mat_file_rule = Path::Iterator::Rule->new
+	->file->name( qr/F_BEGIN.*\.mat$/ );
+my $mat_file_iter = $mat_file_rule->iter( $debug_trace_dir );
 
-my $matlab_param = [ 'n', 'c_nk', 'x' ];
-my $c_param = [ 'hdaf_approx_degree', 'scaling_constant', 'x' ];
-my $matlab_input_values = $p_input->{caller_state}[0]{input}[0];
-my $matlab_output_values = $p_output->{caller_state}[0]{output}[0];
+while( defined( my $mat_file = $mat_file_iter->() ) ) {
+	#say $mat_file;
+	my $f = ORION::FunctionStateFile->new_from_from_filename($mat_file);
+	#use DDP; p $f;
+	if( $f->name eq 'hdaf' ) {
+		run_hdaf_analysis( $f );
+	}
+}
 
-my $c_input_values = [ $matlab_input_values->{n}->squeeze->float,
-	$matlab_input_values->{c_nk}->squeeze->float,
-	$matlab_input_values->{x}->float, ];
+sub run_hdaf_analysis {
+	my ($fs_file) = @_;
+	my $matlab_param = [ 'n', 'c_nk', 'x' ];
+	my $c_param = [ 'hdaf_approx_degree', 'scaling_constant', 'x' ];
+	my $matlab_input_values = $fs_file->input;
+	my $matlab_output_values = $fs_file->output;
 
-my $expected_c_output = $matlab_output_values->{val};
+	my $c_input_values = [ $matlab_input_values->{n}->squeeze->float,
+		$matlab_input_values->{c_nk}->squeeze->float,
+		$matlab_input_values->{x}->float, ];
 
-my $got_c_output = orion_hdaf( @$c_input_values );
+	my $expected_c_output = $matlab_output_values->{val};
 
-use DDP; p $expected_c_output->slice(':10,:10,:10');
-use DDP; p $got_c_output->slice(':10,:10,:10');
+	my $got_c_output = orion_hdaf( @$c_input_values );
 
-my $diff = abs($expected_c_output - $got_c_output);
-use DDP; p $diff;
+	#use DDP; p $expected_c_output->slice(':10,:10,:10');
+	#use DDP; p $got_c_output->slice(':10,:10,:10');
+
+	my $diff = abs($expected_c_output - $got_c_output);
+	use DDP; p $diff->max;
+}
 
 __DATA__
 __C__
