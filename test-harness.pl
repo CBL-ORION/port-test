@@ -19,15 +19,29 @@ use Inline C => 'DATA',
 	with => ['ORION'],
 	;
 
-my $p = Data::MATLAB->read_data( '../orion/test.mat.v7' );
-use DDP; p $p;
+my $p_input = Data::MATLAB->read_data( 'data/debug-trace/hdaf.F_BEGIN.32b30b3b-e2a9-4c04-8cc1-68086684c815.mat' );
+my $p_output = Data::MATLAB->read_data( 'data/debug-trace/hdaf.F_END.32b30b3b-e2a9-4c04-8cc1-68086684c815.mat' );
+#use DDP; p $p_input;
+#use DDP; p $p_output;
 
-my $SZ = 5;
-my $factor = 0.25;
-my $nd = ndcoords(float, $SZ-1,$SZ,$SZ+1);
-#my $q = orion_hdaf(3, 5, sequence(float, 5,5,5));
-my $q = orion_hdaf(3, 5, (( 0.25* $nd)**2)->sumover->sqrt->float );
-use DDP; p $q;
+my $matlab_param = [ 'n', 'c_nk', 'x' ];
+my $c_param = [ 'hdaf_approx_degree', 'scaling_constant', 'x' ];
+my $matlab_input_values = $p_input->{caller_state}[0]{input}[0];
+my $matlab_output_values = $p_output->{caller_state}[0]{output}[0];
+
+my $c_input_values = [ $matlab_input_values->{n}->squeeze->float,
+	$matlab_input_values->{c_nk}->squeeze->float,
+	$matlab_input_values->{x}->float, ];
+
+my $expected_c_output = $matlab_output_values->{val};
+
+my $got_c_output = orion_hdaf( @$c_input_values );
+
+use DDP; p $expected_c_output->slice(':10,:10,:10');
+use DDP; p $got_c_output->slice(':10,:10,:10');
+
+my $diff = abs($expected_c_output - $got_c_output);
+use DDP; p $diff;
 
 __DATA__
 __C__
