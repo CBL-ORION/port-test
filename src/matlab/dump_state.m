@@ -46,14 +46,6 @@ function caller_state = dump_state(path_to_output_directory)
 	caller_state.FILE = current_func.file;
 	caller_state.LINE = current_func.line;
 
-	%% Stack info
-
-	caller_state.STACKID = gen_guid()
-
-	current_stack_info = struct(...
-		'name', caller_state.NAME,...
-		'id', caller_state.STACKID);
-
 	%% Identify stopping location
 	% 1. function start
 	% 2. function end
@@ -76,6 +68,13 @@ function caller_state = dump_state(path_to_output_directory)
 	% that will add another function to the call stack and then
 	% evalin('caller', ...) will no longer work.
 	if strcmp( caller_state.WHERE, 'F_BEGIN' )
+		%% Stack info
+		caller_state.STACKID = gen_guid()
+
+		current_stack_info = struct(...
+			'name', caller_state.NAME,...
+			'id', caller_state.STACKID);
+
 		% push current state on to stack
 		otrace_stack = [ otrace_stack, current_stack_info ];
 		caller_state.STACK = otrace_stack;
@@ -97,7 +96,20 @@ function caller_state = dump_state(path_to_output_directory)
 			end
 		end
 	elseif strcmp( caller_state.WHERE, 'F_END' )
+		%% Stack info
+
+		% the last item on the stack contains the stack ID
+		caller_state.STACKID = otrace_stack(end).id;
 		caller_state.STACK = otrace_stack;
+
+		
+		if( ~ strcmp( otrace_stack(end).name, caller_state.NAME ) )
+			error( 'Stack seems malformed. The last item in the stack (%s) does not have the same name as the current function (%s).',...
+				otrace_stack(end).name, caller_state.NAME );
+			otrace_stack_cell = struct2cell(otrace_stack);
+			otrace_stack_cell
+		end
+
 		otrace_stack = otrace_stack(1:end-1); % pop off stack
 
 
