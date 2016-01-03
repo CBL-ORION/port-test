@@ -1,10 +1,14 @@
-function otrace(path_to_project, code_to_eval)
+function otrace(path_to_project, code_to_eval, skip_func)
 	%% Add the top level of the path to the MATLAB path.
 	addpath(genpath(path_to_project));
 	[path_to_current_mat,~,~] = fileparts(mfilename('fullpath'));
 	addpath(genpath(path_to_current_mat));
 
 	m_funcs = get_project_matlab_funcs(path_to_project);
+	if exist('skip_func', 'var')
+		% remove all instances that need to be skipped
+		m_funcs = m_funcs( find( ~ ismember( m_funcs, skip_func ) ) );
+	end
 
 	%% Set up tracer for debugging
 	log = TraceHistory.Instance;
