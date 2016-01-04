@@ -9,6 +9,7 @@ use Hash::Merge;
 use Path::Iterator::Rule;
 use Parse::RecDescent;
 use Data::MATLAB;
+use ORION::Function::C;
 
 sub basedir {
 	my $file = path(__FILE__)->absolute;
@@ -70,17 +71,25 @@ sub c_functions {
 	my $header_file_rule = Path::Iterator::Rule->new
 		->file->name( qr/\.h$/ );
 	my $header_file_iter = $header_file_rule->iter( ORION->oriondir->child('lib') );
+	my $functions;
 	while( defined( my $file = $header_file_iter->() ) ) {
 		my $code = path($file)->slurp_utf8;
 		my $parser = Parse::RecDescent->new(c_grammar());
 		$parser->{data}{AUTOWRAP} = 1;
 		$parser->{data}{file} = $file;
 		$parser->code( $code ) or die "could not parse file $file";
-		use DDP; p $parser->{data};
 
-		# TODO create C function object
+		# create C function objects
+		push @{$functions}, @{
+			ORION::Function::C->new_functions_from_parser_data( $parser->{data} );
+		}
 	}
-
+	for my $f (@$functions) {
+		for my $p (@{$f->params}) {
+			$p->type->unqualified_type;
+		}
+	}
+	use DDP  { class => { expand => 'all' } }; p $functions ;
 }
 
 sub matlab_functions {
