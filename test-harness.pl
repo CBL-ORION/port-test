@@ -38,11 +38,11 @@ for my $hdaf_function_data (@{ $data_by_function->{hdaf} }) {
 }
 
 sub coerce_type {
-	my ($type) = @_;
+	my ($type, $data) = @_;
 	given( $type ) {
-		when('int') { ... }
-		when('float') { ... }
-		when('ndarray3 *') { ... }
+		when('int') { long($data)->squeeze }
+		when('float') { float($data)->squeeze }
+		when('ndarray3 *') { float($data) }
 	}
 }
 
@@ -54,9 +54,12 @@ sub run_hdaf_analysis {
 	my $matlab_input_values = $fs_file->input;
 	my $matlab_output_values = $fs_file->output;
 
-	my $c_input_values = [ $matlab_input_values->{n}->squeeze->int,
-		$matlab_input_values->{c_nk}->squeeze->float,
-		$matlab_input_values->{x}->float, ];
+	my $c_input_values = [
+		map {
+			coerce_type(
+				$c_param_type->[$_],
+				$matlab_input_values->{$matlab_param->[$_]})
+		} 0..@$matlab_param-1 ];
 
 	my $expected_c_output = $matlab_output_values->{val};
 
