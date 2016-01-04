@@ -1,4 +1,8 @@
 language: c
+cache:
+  directories:
+  # local::lib caching
+  - perl5/lib/perl5
 sudo: false
 addons:
   apt:
