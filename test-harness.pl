@@ -37,14 +37,24 @@ for my $hdaf_function_data (@{ $data_by_function->{hdaf} }) {
 	run_hdaf_analysis( $hdaf_function_data );
 }
 
+sub coerce_type {
+	my ($type) = @_;
+	given( $type ) {
+		when('int') { ... }
+		when('float') { ... }
+		when('ndarray3 *') { ... }
+	}
+}
+
 sub run_hdaf_analysis {
 	my ($fs_file) = @_;
 	my $matlab_param = [ 'n', 'c_nk', 'x' ];
 	my $c_param = [ 'hdaf_approx_degree', 'scaling_constant', 'x' ];
+	my $c_param_type = [ 'int', 'float', 'ndarray3 *' ];
 	my $matlab_input_values = $fs_file->input;
 	my $matlab_output_values = $fs_file->output;
 
-	my $c_input_values = [ $matlab_input_values->{n}->squeeze->float,
+	my $c_input_values = [ $matlab_input_values->{n}->squeeze->int,
 		$matlab_input_values->{c_nk}->squeeze->float,
 		$matlab_input_values->{x}->float, ];
 
