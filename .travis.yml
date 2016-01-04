@@ -1,18 +1,41 @@
 language: c
-sudo: true
+sudo: false
+addons:
+  apt:
+    packages:
+    - build-essential
+    # for PDL
+    - libx11-dev
+    - libgd2-xpm-dev
+    - libhdf4-alt-dev
+    - libproj-dev
+    - proj-bin
+    - libcfitsio3-dev
+    - libreadline-dev
+    - gfortran
+    - pgplot5
+    - libvpx-dev
+    - libxpm-dev
+    - libxi-dev
+    - libxmu-dev
+    - freeglut3-dev
+    - libgsl0-dev
+    - libnetpbm10-dev
+    # matio
+    - libmatio-dev
 env:
   - PROD=1 TEST_VERBOSE=1 ORION_PATH="./orion"
 compiler:
   - gcc
   #- clang
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install libmatio-dev
-  - sudo apt-get build-dep pdl
-  - curl -L https://cpanmin.us | perl - --sudo App::cpanminus
-  - sudo cpanm --notest PDL || true
-  - sudo cpanm --notest --installdeps . || true
-  - sudo cpanm --notest PDL
+  - curl -L https://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+  - eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+  - echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.profile
+  - echo 'export MANPATH=$HOME/perl5/man:$MANPATH' >> ~/.profile
+  - cpanm --notest PDL || true
+  - cpanm --notest --installdeps . || true
+  - cpanm --notest PDL
   - git clone https://github.com/CBL-ORION/ITK-builds.git external/ITK
   # path for CMake to search for built ITK
   - export ITK_DIR="`( cd external/ITK/usr/local/lib/cmake/ITK-4.9 && pwd )`"
