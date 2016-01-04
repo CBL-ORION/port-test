@@ -25,13 +25,16 @@ my $mat_file_rule = Path::Iterator::Rule->new
 	->file->name( qr/F_BEGIN.*\.mat$/ );
 my $mat_file_iter = $mat_file_rule->iter( $debug_trace_dir );
 
+my $data_by_function;
 while( defined( my $mat_file = $mat_file_iter->() ) ) {
 	#say $mat_file;
 	my $f = ORION::FunctionStateFile->new_from_from_filename($mat_file);
 	#use DDP; p $f;
-	if( $f->name eq 'hdaf' ) {
-		run_hdaf_analysis( $f );
-	}
+	push @{ $data_by_function->{$f->name} }, $f;
+}
+
+for my $hdaf_function_data (@{ $data_by_function->{hdaf} }) {
+	run_hdaf_analysis( $hdaf_function_data );
 }
 
 sub run_hdaf_analysis {
