@@ -1,4 +1,4 @@
-package ORION::Variable::C;
+package ORION::C::Variable;
 
 use strict;
 use warnings;

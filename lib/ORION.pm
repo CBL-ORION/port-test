@@ -9,7 +9,7 @@ use Hash::Merge;
 use Path::Iterator::Rule;
 use Parse::RecDescent;
 use Data::MATLAB;
-use ORION::Function::C;
+use ORION::C::Function;
 
 sub basedir {
 	my $file = path(__FILE__)->absolute;
@@ -81,7 +81,7 @@ sub c_functions {
 
 		# create C function objects
 		push @{$functions}, @{
-			ORION::Function::C->new_functions_from_parser_data( $parser->{data} );
+			ORION::C::Function->new_functions_from_parser_data( $parser->{data} );
 		}
 	}
 	return $functions;

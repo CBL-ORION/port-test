@@ -1,4 +1,4 @@
-package ORION::Type::C;
+package ORION::C::Type;
 
 use strict;
 use warnings;

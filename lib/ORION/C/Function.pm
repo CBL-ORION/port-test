@@ -1,10 +1,10 @@
-package ORION::Function::C;
+package ORION::C::Function;
 
 use Moo;
 use Types::Standard -types;
 
-use ORION::Variable::C;
-use ORION::Type::C;
+use ORION::C::Variable;
+use ORION::C::Type;
 
 has name => ( is => 'ro', required => 1, isa => Str );
 has 'params' => ( is => 'ro', required => 1, isa => ArrayRef );
@@ -23,13 +23,13 @@ sub new_functions_from_parser_data {
 			name => $function_name,
 			params => [
 				map {
-					ORION::Variable::C->new(
-						type => ORION::Type::C->new( decl => $f_data->{arg_types}[$_] ),
+					ORION::C::Variable->new(
+						type => ORION::C::Type->new( decl => $f_data->{arg_types}[$_] ),
 						name => $f_data->{arg_names}[$_],
 					)
 				} 0..@{ $f_data->{arg_names} }-1
 			],
-			return_type => ORION::Type::C->new( decl => $f_data->{return_type} ),
+			return_type => ORION::C::Type->new( decl => $f_data->{return_type} ),
 		);
 
 	}
