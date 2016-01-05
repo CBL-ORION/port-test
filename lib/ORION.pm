@@ -48,6 +48,23 @@ sub Inline {
 	# when merging
 	my $config = {
 		AUTO_INCLUDE => [ <<C ],
+#include "ndarray/ndarray3.h"
+#include "ndarray/ndarray3_complex.h"
+
+#include "container/array.h"
+#include "container/vector.h"
+
+#include "param/segmentation.h"
+#include "param/io.h"
+#include "param/orion3.h"
+
+#include "io/path/path.h"
+#include "io/format/mhd.h"
+
+#include "kitchen-sink/01_Segmentation/dendrites_main/ExtractFeatures/computeEigenvaluesGaussianFilter.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/IsotropicFilter/Makefilter.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/multiscaleLaplacianFilter.h"
+
 #include "orion_util.c"
 C
 		INC => [

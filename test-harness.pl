@@ -20,25 +20,41 @@ use Inline C => 'DATA',
 	with => ['ORION'],
 	;
 
-my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
-my $mat_file_rule = Path::Iterator::Rule->new
-	->file->name( qr/F_BEGIN.*\.mat$/ );
-my $mat_file_iter = $mat_file_rule->iter( $debug_trace_dir );
+sub _bind_c_functions {
+	my @c_funcs = @{ ORION->c_functions };
+	my $protos = join "\n", map { $_->prototype } @c_funcs;
 
-my $data_by_function;
-while( defined( my $mat_file = $mat_file_iter->() ) ) {
-	#say $mat_file;
-	my $f = ORION::FunctionStateFile->new_from_from_filename($mat_file);
-	#use DDP; p $f;
-	push @{ $data_by_function->{$f->name} }, $f;
+	Inline->bind( C => $protos,
+		ENABLE => AUTOWRAP =>
+		with => [ 'ORION' ] );
 }
 
-my $matlab_hdaf = ( grep { $_->name eq 'hdaf' } @{ ORION->matlab_functions } )[0];
-my $c_hdaf = ( grep { $_->name eq 'orion_hdaf' } @{ ORION->c_functions } )[0];
-use DDP; p $matlab_hdaf;
-use DDP; p $c_hdaf;
-for my $hdaf_function_data (@{ $data_by_function->{hdaf} }) {
-	run_hdaf_analysis( $hdaf_function_data, $matlab_hdaf, $c_hdaf );
+sub main {
+	_bind_c_functions();
+	my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
+	my $mat_file_rule = Path::Iterator::Rule->new
+		->file->name( qr/F_BEGIN.*\.mat$/ );
+	my $mat_file_iter = $mat_file_rule->iter( $debug_trace_dir );
+
+	my $data_by_function;
+	while( defined( my $mat_file = $mat_file_iter->() ) ) {
+		#say $mat_file;
+		my $f = ORION::FunctionStateFile->new_from_from_filename($mat_file);
+		#use DDP; p $f;
+		push @{ $data_by_function->{$f->name} }, $f;
+	}
+	do_hdaf_analysis($data_by_function->{hdaf});
+}
+
+sub do_hdaf_analysis {
+	my ($all_hdaf_data) = @_;
+	my $matlab_hdaf = ( grep { $_->name eq 'hdaf' } @{ ORION->matlab_functions } )[0];
+	my $c_hdaf = ( grep { $_->name eq 'orion_hdaf' } @{ ORION->c_functions } )[0];
+	#use DDP; p $matlab_hdaf;
+	#use DDP; p $c_hdaf;
+	for my $hdaf_function_data (@$all_hdaf_data) {
+		compare_hdaf( $hdaf_function_data, $matlab_hdaf, $c_hdaf );
+	}
 }
 
 sub coerce_type {
@@ -50,7 +66,7 @@ sub coerce_type {
 	}
 }
 
-sub run_hdaf_analysis {
+sub compare_hdaf {
 	my ($fs_file, $m, $c) = @_;
 	my $matlab_param = [ map { $_->name } @{ $m->params } ];
 	my $c_param = [ map { $_->name } @{ $c->params } ];
@@ -76,13 +92,7 @@ sub run_hdaf_analysis {
 	use DDP; p $diff->max;
 }
 
+main;
 __DATA__
 __C__
 
-#include "ndarray/ndarray3.h"
-/*#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/IsotropicFilter/hdaf.h"*/
-
-extern ndarray3* orion_hdaf(
-		int hdaf_approx_degree,
-		float scaling_constant,
-		ndarray3* x);

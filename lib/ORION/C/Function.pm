@@ -10,6 +10,8 @@ has name => ( is => 'ro', required => 1, isa => Str );
 has 'params' => ( is => 'ro', required => 1, isa => ArrayRef );
 has return_type => ( is => 'ro', required => 1 );
 
+has prototype => ( is => 'lazy', isa => Str );
+
 has language => ( is => 'ro', isa => Str, default => sub { "C" } );
 
 with qw(ORION::Role::FunctionRole);
@@ -34,6 +36,15 @@ sub new_functions_from_parser_data {
 
 	}
 	return \@functions;
+}
+
+sub _build_prototype {
+	my ($self) = @_;
+	return <<"C";
+extern @{[ $self->return_type->decl ]} @{[ $self->name ]} (
+	@{[ join ", ", map { $_->cstr } @{ $self->params } ]}
+);
+C
 }
 
 1;
