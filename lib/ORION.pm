@@ -84,12 +84,7 @@ sub c_functions {
 			ORION::Function::C->new_functions_from_parser_data( $parser->{data} );
 		}
 	}
-	for my $f (@$functions) {
-		for my $p (@{$f->params}) {
-			$p->type->unqualified_type;
-		}
-	}
-	use DDP  { class => { expand => 'all' } }; p $functions ;
+	return $functions;
 }
 
 sub matlab_functions {

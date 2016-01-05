@@ -8,9 +8,10 @@ if(not ORION->orionmatdir->exists) {
 
 plan tests => 1;
 
-ORION->c_functions;
+my $c_functions = ORION->c_functions;
+#use DDP  { class => { expand => 'all' } }; p $c_functions ;
 
-#ORION->matlab_functions;
+my $m_functins = ORION->matlab_functions;
 
 ok(1);
 
