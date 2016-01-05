@@ -33,13 +33,17 @@ while( defined( my $mat_file = $mat_file_iter->() ) ) {
 	push @{ $data_by_function->{$f->name} }, $f;
 }
 
+my $matlab_hdaf = ( grep { $_->name eq 'hdaf' } @{ ORION->matlab_functions } )[0];
+my $c_hdaf = ( grep { $_->name eq 'orion_hdaf' } @{ ORION->c_functions } )[0];
+use DDP; p $matlab_hdaf;
+use DDP; p $c_hdaf;
 for my $hdaf_function_data (@{ $data_by_function->{hdaf} }) {
-	run_hdaf_analysis( $hdaf_function_data );
+	run_hdaf_analysis( $hdaf_function_data, $matlab_hdaf, $c_hdaf );
 }
 
 sub coerce_type {
 	my ($type, $data) = @_;
-	given( $type ) {
+	given( $type->unqualified_type ) {
 		when('int') { long($data)->squeeze }
 		when('float') { float($data)->squeeze }
 		when('ndarray3 *') { float($data) }
@@ -47,10 +51,10 @@ sub coerce_type {
 }
 
 sub run_hdaf_analysis {
-	my ($fs_file) = @_;
-	my $matlab_param = [ 'n', 'c_nk', 'x' ];
-	my $c_param = [ 'hdaf_approx_degree', 'scaling_constant', 'x' ];
-	my $c_param_type = [ 'int', 'float', 'ndarray3 *' ];
+	my ($fs_file, $m, $c) = @_;
+	my $matlab_param = [ map { $_->name } @{ $m->params } ];
+	my $c_param = [ map { $_->name } @{ $c->params } ];
+	my $c_param_type = [ map { $_->type } @{ $c->params } ];
 	my $matlab_input_values = $fs_file->input;
 	my $matlab_output_values = $fs_file->output;
 

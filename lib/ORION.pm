@@ -10,6 +10,7 @@ use Path::Iterator::Rule;
 use Parse::RecDescent;
 use Data::MATLAB;
 use ORION::C::Function;
+use ORION::MATLAB::Function;
 
 sub basedir {
 	my $file = path(__FILE__)->absolute;
@@ -104,7 +105,9 @@ sub matlab_functions {
 			'-r', $EXEC );
 	}
 	my $data = Data::MATLAB->read_data( $matlab_func_mat_file );
-	use DDP; p $data;
+	return [ map {
+		ORION::MATLAB::Function->new_from_parser_data($_)
+	} @{ $data->{data}[0]{functions} } ];
 }
 
 sub c_grammar {
