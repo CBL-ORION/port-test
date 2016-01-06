@@ -13,6 +13,7 @@ use ORION::C::Function;
 use ORION::MATLAB::Function;
 use List::UtilsBy qw(sort_by);
 use Memoize;
+use Log::Log4perl qw(:easy);
 
 use Inline;
 
@@ -110,10 +111,13 @@ C
 
 sub c_functions {
 	# get all the .h files under lib/
+	my $c_project_lib = ORION->oriondir->child('lib');
 	my $header_file_rule = Path::Iterator::Rule->new
 		->file->name( qr/\.h$/ );
-	my $header_file_iter = $header_file_rule->iter( ORION->oriondir->child('lib') );
+	my $header_file_iter = $header_file_rule->iter( $c_project_lib );
+
 	my $functions;
+	INFO "Getting a list of C functions for project in $c_project_lib";
 	while( defined( my $file = $header_file_iter->() ) ) {
 		my $code = path($file)->slurp_utf8;
 		my $parser = Parse::RecDescent->new(c_grammar());
@@ -136,6 +140,7 @@ sub matlab_functions {
 	my $matlab_source = ORION->matlabsrcdir;
 	my $project = ORION->orionmatdir;
 
+	INFO "Getting a list of MATLAB functions for project in $project";
 	unless( -r $matlab_func_mat_file ) {
 		my $EXEC = join ",", (
 			"addpath('$matlab_source')",
@@ -144,6 +149,8 @@ sub matlab_functions {
 		);
 		system( qw(matlab -nodesktop -nodisplay -nosplash),
 			'-r', $EXEC );
+	} else {
+		INFO "Using cache in $matlab_func_mat_file";
 	}
 	my $data = Data::MATLAB->read_data( $matlab_func_mat_file );
 	return [ map {

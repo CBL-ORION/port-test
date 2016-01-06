@@ -3,6 +3,7 @@ requires 'Data::Printer'; # needed to dump output .mat file contents
 requires 'Capture::Tiny';
 requires 'List::UtilsBy';
 requires 'Memoize';
+requires 'Log::Log4perl';
 
 # handling data
 requires 'Moo';
