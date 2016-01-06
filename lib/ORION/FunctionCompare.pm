@@ -6,9 +6,7 @@ use ORION::FunctionStateFile;
 use ORION::Types;
 
 has qw(function_state_dir) => ( is => 'ro', required => 1,
-	default => sub {
-		my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
-	}
+	default => sub { ORION->function_state_dir }
 );
 
 has [ qw(matlab_function c_function) ] => ( is => 'ro', required => 1 );

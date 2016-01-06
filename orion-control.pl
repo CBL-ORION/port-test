@@ -15,7 +15,7 @@ my $command = Expect->spawn("matlab", qw(-nodesktop -nodisplay -nosplash))
 
 my $matlab_source = ORION->matlabsrcdir;
 my $project = ORION->orionmatdir;
-my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
+my $debug_trace_dir = ORION->function_state_dir;
 my $orion3mat_test_data_conf = ORION->oriondir->child(qw(test-data DIADEM NPF Input_NPF023_D.txt));
 
 # functions to skip in orionmat code

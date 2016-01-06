@@ -57,6 +57,11 @@ sub datadir {
 	$base_dir->child('data');
 }
 
+sub function_state_dir {
+	my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
+}
+
+
 sub Inline {
 	return unless $_[-1]  eq 'C';
 
