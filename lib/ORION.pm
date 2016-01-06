@@ -11,6 +11,25 @@ use Parse::RecDescent;
 use Data::MATLAB;
 use ORION::C::Function;
 use ORION::MATLAB::Function;
+use List::UtilsBy qw(sort_by);
+use Memoize;
+
+use Inline;
+
+sub import {
+	_bind_c_functions();
+	memoize('ORION::c_functions');
+	memoize('ORION::matlab_functions');
+}
+
+sub _bind_c_functions {
+	my @c_funcs = sort_by { $_->name } @{ ORION->c_functions };
+	my $protos = join "\n", map { $_->prototype } @c_funcs;
+
+	Inline->bind( C => $protos,
+		ENABLE => AUTOWRAP =>
+		with => [ 'ORION' ] );
+}
 
 sub basedir {
 	my $file = path(__FILE__)->absolute;

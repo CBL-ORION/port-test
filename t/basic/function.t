@@ -1,5 +1,8 @@
 use Test::Most;
 
+use strict;
+use warnings;
+
 use ORION;
 
 if(not ORION->orionmatdir->exists) {

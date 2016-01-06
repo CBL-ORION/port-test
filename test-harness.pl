@@ -10,27 +10,7 @@ use Data::MATLAB;
 use ORION;
 use ORION::FunctionStateFile;
 
-#use Inline Config =>
-	#enable => force_build =>
-	#enable => build_noisy =>
-	#disable => clean_after_build =>;
-
-use Inline C => 'DATA',
-	ENABLE => AUTOWRAP =>
-	with => ['ORION'],
-	;
-
-sub _bind_c_functions {
-	my @c_funcs = @{ ORION->c_functions };
-	my $protos = join "\n", map { $_->prototype } @c_funcs;
-
-	Inline->bind( C => $protos,
-		ENABLE => AUTOWRAP =>
-		with => [ 'ORION' ] );
-}
-
 sub main {
-	_bind_c_functions();
 	my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
 	my $mat_file_rule = Path::Iterator::Rule->new
 		->file->name( qr/F_BEGIN.*\.mat$/ );
@@ -83,7 +63,7 @@ sub compare_hdaf {
 
 	my $expected_c_output = $matlab_output_values->{val};
 
-	my $got_c_output = orion_hdaf( @$c_input_values );
+	my $got_c_output = ORION::orion_hdaf( @$c_input_values );
 
 	#use DDP; p $expected_c_output->slice(':10,:10,:10');
 	#use DDP; p $got_c_output->slice(':10,:10,:10');
@@ -93,6 +73,6 @@ sub compare_hdaf {
 }
 
 main;
-__DATA__
-__C__
+#__DATA__
+#__C__
 

@@ -40,11 +40,13 @@ sub new_functions_from_parser_data {
 
 sub _build_prototype {
 	my ($self) = @_;
-	return <<"C";
-extern @{[ $self->return_type->decl ]} @{[ $self->name ]} (
-	@{[ join ", ", map { $_->cstr } @{ $self->params } ]}
-);
-C
+	return
+	  "extern @{[ $self->return_type->decl ]}"         # return
+	. " "
+	. $self->name                                      # function name
+	. "("
+	. join(", ", map { $_->cstr } @{ $self->params })  # function parameters
+	. ");";
 }
 
 1;
