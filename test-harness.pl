@@ -9,6 +9,7 @@ use PDL;
 use Data::MATLAB;
 use ORION;
 use ORION::FunctionStateFile;
+use ORION::Types;
 
 sub main {
 	my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
@@ -37,15 +38,6 @@ sub do_hdaf_analysis {
 	}
 }
 
-sub coerce_type {
-	my ($type, $data) = @_;
-	given( $type->unqualified_type ) {
-		when('int') { long($data)->squeeze }
-		when('float') { float($data)->squeeze }
-		when('ndarray3 *') { float($data) }
-	}
-}
-
 sub compare_hdaf {
 	my ($fs_file, $m, $c) = @_;
 	my $matlab_param = [ map { $_->name } @{ $m->params } ];
@@ -56,7 +48,7 @@ sub compare_hdaf {
 
 	my $c_input_values = [
 		map {
-			coerce_type(
+			ORION::Types->coerce_type(
 				$c_param_type->[$_],
 				$matlab_input_values->{$matlab_param->[$_]})
 		} 0..@$matlab_param-1 ];
