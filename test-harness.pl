@@ -15,8 +15,8 @@ use Log::Log4perl qw(:easy);
 sub main {
 	Log::Log4perl->easy_init($DEBUG);
 	my $function_compare_by_name = build_function_comparisons();
-	#compare_all_function_states( $function_compare_by_name->{Makefilter} );
-	compare_all_function_states( $function_compare_by_name->{hdaf} );
+	compare_all_function_states( $function_compare_by_name->{Makefilter} );
+	#compare_all_function_states( $function_compare_by_name->{hdaf} );
 }
 
 sub build_function_comparisons {

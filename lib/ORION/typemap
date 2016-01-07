@@ -1,6 +1,7 @@
 TYPEMAP
 
 ndarray3* T_NDARRAY3
+orion_Makefilter_flag T_ENUM
 
 
 INPUT
