@@ -14,7 +14,10 @@ TEST_OBJ := $(call TEST_PATHSUBST.c,$(TEST.c))
 all:
 	echo "Success!"
 
-dep: | dep.c-tap-harness dep dep.perl
+dep: | dep.c-tap-harness dep dep.perl dep.R
+
+dep.R:
+	Rscript ./install.R
 
 dep.perl:
 	cpanm --installdeps .
