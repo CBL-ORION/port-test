@@ -3,7 +3,9 @@ package ORION::Compare;
 use strict;
 use warnings;
 
+use v5.16;
 use PDL;
+use Statistics::NiceR;
 
 sub compare_volume_inf_norm {
 	my %args = @_;
@@ -19,9 +21,9 @@ sub compare_volume_inf_norm {
 
 sub volume_histogram_uniq {
 	my ($volume) = @_;
-	my $uniq = $volume->uniq;
+	my $uniq = $volume->flat->uniq;
 	my $count = $uniq->zeroes;
-	PDL::indadd(1, PDL::vsearch_match( $volume, $uniq )->flat, $count );
+	PDL::indadd(1, PDL::vsearch_match( $volume, $uniq ), $count );
 	($uniq, $count);
 }
 
@@ -43,7 +45,19 @@ sub histogram_similarity_intersection {
 
 	my ($ha, $hb) = @_;
 
-	$ha->cat($hb)->xchg(0,1)->minimum->sum / $hb->sum;
+	$ha->cat($hb)->xchg(0,1)->minimum->sum / $ha->sum;
+}
+
+sub histogram_similarity_emd {
+	my ($ha, $hb) = @_;
+	# TODO calculate the earth mover's distance between the histograms
+	state $r;
+	if( not defined $r ) {
+		$r = Statistics::NiceR->new;
+		$r->library('emdist');
+	}
+
+	#$r->emd($ha, $hb);
 }
 
 sub histogram_similarity_on_bin_centres {
@@ -61,15 +75,10 @@ sub compare_volume_histogram {
 
 	$tol //= 1e-10;
 
-	# TODO histogram similarity
-
-	my ($e_v, $e_c) = volume_histogram_bin_largest_dim($expected->float);
-
-	my ($g_v, $g_c) = volume_histogram_bin_largest_dim($got);
-	use DDP; p $e_c; p $g_c;
+	my ($e_v, $e_c) = volume_histogram_bin_largest_dim($expected->double);
+	my ($g_v, $g_c) = volume_histogram_bin_largest_dim($got->double);
 
 	my $sim = histogram_similarity_intersection($e_c, $g_c);
-	use DDP; p $sim;
 	$sim;
 }
 

@@ -114,8 +114,6 @@ sub compare_state {
 
 	my $diff = $compare->( expected => $expected_c_output, got => $got_c_output);
 
-	use DDP; p $diff;
-
 	$diff;
 }
 
