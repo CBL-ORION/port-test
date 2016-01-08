@@ -110,8 +110,13 @@ sub compare_state {
 		}
 	}
 
-	my $diff = abs($expected_c_output - $got_c_output);
-	use DDP; p $diff->max;
+	my $compare = $mapping->{compare} // \&ORION::Compare::compare_volume_inf_norm;
+
+	my $diff = $compare->( expected => $expected_c_output, got => $got_c_output);
+
+	use DDP; p $diff;
+
+	$diff;
 }
 
 1;
