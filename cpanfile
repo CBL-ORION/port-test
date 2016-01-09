@@ -4,6 +4,7 @@ requires 'Capture::Tiny';
 requires 'List::UtilsBy';
 requires 'Memoize';
 requires 'Log::Log4perl';
+requires 'YAML::XS';
 
 # handling data
 requires 'Moo';

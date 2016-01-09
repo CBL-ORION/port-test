@@ -11,6 +11,7 @@ use Parse::RecDescent;
 use Data::MATLAB;
 use ORION::C::Function;
 use ORION::MATLAB::Function;
+use ORION::FunctionCompare;
 use List::UtilsBy qw(sort_by);
 use Memoize;
 use Log::Log4perl qw(:easy);
@@ -21,6 +22,48 @@ sub import {
 	_bind_c_functions();
 	memoize('ORION::c_functions');
 	memoize('ORION::matlab_functions');
+}
+
+sub build_function_comparisons {
+	my $matlab_functions_by_name = {
+		map { ( $_->name => $_ ) }
+		@{ ORION->matlab_functions } };
+	my $c_functions_by_name = {
+		map { ( $_->name => $_ ) }
+		@{ ORION->c_functions } };
+
+	my $debug_trace_dir = ORION->function_state_dir;
+	my $mat_file_rule = Path::Iterator::Rule->new
+		->file->name( qr/F_BEGIN.*\.mat$/ );
+	my $mat_file_iter = $mat_file_rule->iter( $debug_trace_dir );
+
+	my $function_names;
+	INFO "Reading list of function names from the function state data directory";
+	while( defined( my $mat_file = $mat_file_iter->() ) ) {
+		# the first part of the filename is the function name
+		my $f_name = ( path($mat_file)->basename =~ /^([^.]+)/ )[0];
+		$function_names->{$f_name} = 1;
+	}
+
+	my $function_compare_by_name = {};
+	my $m_func_not_matched;
+	for my $m_func_name (keys %$function_names) {
+		my $c_func_name = "orion_$m_func_name";
+		if( exists $c_functions_by_name->{$c_func_name} ) {
+			$function_compare_by_name->{$m_func_name} =
+				ORION::FunctionCompare->new(
+					matlab_function => $matlab_functions_by_name->{$m_func_name},
+					c_function => $c_functions_by_name->{$c_func_name},
+				);
+		} else {
+			push @$m_func_not_matched, $m_func_name;
+		}
+	}
+
+	# TODO need to examine $m_func_not_matched
+	LOGWARN "There are @{[ scalar @$m_func_not_matched ]} MATLAB functions that do not have corresponding C functions";
+
+	$function_compare_by_name;
 }
 
 sub _bind_c_functions {

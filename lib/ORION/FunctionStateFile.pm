@@ -11,6 +11,9 @@ has [ qw(directory) ] => ( is => 'ro', required => 1 );
 has [ qw(name stack_id) ] => ( is => 'rw', required => 1 );
 
 has [ qw(_input_file _output_file) ] => ( is => 'lazy' );
+has [ qw(_input_data _output_data) ] => ( is => 'lazy' );
+
+has [ qw(start_time stop_time stack_trace) ] => ( is => 'lazy' );
 
 has [ qw(input output) ] => ( is => 'lazy' );
 
@@ -28,15 +31,41 @@ sub _build__output_file {
 	);
 }
 
-sub _build_input {
+sub _build__input_data {
 	my ($self) = @_;
 	my $p_input = Data::MATLAB->read_data( $self->_input_file );
+}
+
+sub _build__output_data {
+	my ($self) = @_;
+	my $p_output = Data::MATLAB->read_data( $self->_output_file );
+}
+
+sub _build_stack_trace {
+	my ($self) = @_;
+	my $p_input = $self->_input_data;
+	$p_input->{caller_state}[0]{STACK};
+}
+
+sub _build_start_time {
+	my ($self) = @_;
+	$self->_input_data->{caller_state}[0]{TIME}->squeeze;
+}
+
+sub _build_stop_time {
+	my ($self) = @_;
+	$self->_output_data->{caller_state}[0]{TIME}->squeeze;
+}
+
+sub _build_input {
+	my ($self) = @_;
+	my $p_input = $self->_input_data;
 	return $p_input->{caller_state}[0]{input}[0];
 }
 
 sub _build_output {
 	my ($self) = @_;
-	my $p_output = Data::MATLAB->read_data( $self->_output_file );
+	my $p_output = $self->_output_data;
 	return $p_output->{caller_state}[0]{output}[0];
 }
 

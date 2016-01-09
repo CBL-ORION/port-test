@@ -15,3 +15,7 @@ $
 matlab -nodesktop -nosplash -nodisplay -r "addpath('src/matlab'), otrace('external/orionmat', 'ORION3(''orion/test-data/DIADEM/NPF/Input_NPF023_D.txt'')')"
 
 ./setup && ./build-liborion && make dep.debian dep && prove -lvr t && ./orion-control.pl
+
+./call-graph-from-trace.pl
+
+./test-harness.pl
