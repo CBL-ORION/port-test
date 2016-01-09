@@ -14,7 +14,7 @@ has qw(function_state_dir) => ( is => 'ro', required => 1,
 
 has [ qw(matlab_function c_function) ] => ( is => 'ro', required => 1 );
 
-has qw(function_states) => ( is => 'lazy' );
+has qw(function_states) => ( is => 'lazy', clearer => 1 );
 
 sub _build_function_states {
 	my ($self) = @_;
