@@ -69,6 +69,10 @@ SV* read_data(SV* self, char* filename ) {
 SV* process_matvar( matvar_t* data ) {
 	/*[>DEBUG<]matio_dump_info(data);*/
 	/* switch over `enum matio_classes` */
+	if( data->isComplex ) {
+		croak("Do not know how to handle complex data: name: %s class: %s",
+			data->name, matio_class_to_char(data->class_type));
+	}
 	switch( data->class_type ) {
 		case MAT_C_EMPTY:     return process_unimplemented(data);
 		case MAT_C_CELL:      return process_mat_t_cell(data);
