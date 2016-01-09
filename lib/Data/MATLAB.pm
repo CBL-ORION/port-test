@@ -38,6 +38,7 @@ SV* process_mat_t_struct(matvar_t* data);
 SV* process_mat_c_double(matvar_t* data);
 SV* process_mat_c_single(matvar_t* data);
 SV* process_mat_c_uint8(matvar_t* data);
+SV* process_mat_c_uint16(matvar_t* data);
 SV* process_mat_c_char(matvar_t* data);
 
 SV* read_data(SV* self, char* filename ) {
@@ -80,7 +81,7 @@ SV* process_matvar( matvar_t* data ) {
 		case MAT_C_INT8:      return process_unimplemented(data);
 		case MAT_C_UINT8:     return process_mat_c_uint8(data);
 		case MAT_C_INT16:     return process_unimplemented(data);
-		case MAT_C_UINT16:    return process_unimplemented(data);
+		case MAT_C_UINT16:    return process_mat_c_uint16(data);
 		case MAT_C_INT32:     return process_unimplemented(data);
 		case MAT_C_UINT32:    return process_unimplemented(data);
 		case MAT_C_INT64:     return process_unimplemented(data);
@@ -169,7 +170,9 @@ SV* process_mat_c_uint8(matvar_t* data) {
 	return matvar_t_to_pdl(data, PDL_B);
 }
 
-
+SV* process_mat_c_uint16(matvar_t* data) {
+	return matvar_t_to_pdl(data, PDL_US);
+}
 
 SV* process_mat_c_char(matvar_t* data) {
 	SV* rv;
