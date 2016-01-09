@@ -49,12 +49,12 @@ sub _build_stack_trace {
 
 sub _build_start_time {
 	my ($self) = @_;
-	$self->_input_data->{caller_state}[0]{TIME}->squeeze;
+	$self->_input_data->{caller_state}[0]{TIME}->squeeze->sclr;
 }
 
 sub _build_stop_time {
 	my ($self) = @_;
-	$self->_output_data->{caller_state}[0]{TIME}->squeeze;
+	$self->_output_data->{caller_state}[0]{TIME}->squeeze->sclr;
 }
 
 sub _build_input {
