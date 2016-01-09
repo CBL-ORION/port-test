@@ -154,6 +154,16 @@ SV* matvar_t_to_pdl(matvar_t* data, int datatype) {
 	PDL->allocdata(p);
 	memcpy(p->data, data->data, data->nbytes);
 
+	if( data->isLogical ) {
+		HV* p_h;
+		if( !p->hdrsv ) {
+			p->hdrsv = newRV((SV*)newHV());
+		}
+		p_h = SvRV((SV*)(p->hdrsv));
+
+		hv_stores( p_h, "logical", newSViv( !!( data->isLogical ) ));
+	}
+
 	/* store in SV */
 	rv = newSV(0);
 	PDL->SetSV_PDL(rv, p);
