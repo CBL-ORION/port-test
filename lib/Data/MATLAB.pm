@@ -36,6 +36,7 @@ size_t matio_nelems(matvar_t* data);
 SV* process_matvar( matvar_t* data );
 SV* process_mat_t_struct(matvar_t* data);
 SV* process_mat_c_double(matvar_t* data);
+SV* process_mat_c_single(matvar_t* data);
 SV* process_mat_c_uint8(matvar_t* data);
 SV* process_mat_c_char(matvar_t* data);
 
@@ -75,7 +76,7 @@ SV* process_matvar( matvar_t* data ) {
 		case MAT_C_CHAR:      return process_mat_c_char(data);
 		case MAT_C_SPARSE:    return process_unimplemented(data);
 		case MAT_C_DOUBLE:    return process_mat_c_double(data);
-		case MAT_C_SINGLE:    return process_unimplemented(data);
+		case MAT_C_SINGLE:    return process_mat_c_single(data);
 		case MAT_C_INT8:      return process_unimplemented(data);
 		case MAT_C_UINT8:     return process_mat_c_uint8(data);
 		case MAT_C_INT16:     return process_unimplemented(data);
@@ -158,6 +159,10 @@ SV* matvar_t_to_pdl(matvar_t* data, int datatype) {
 
 SV* process_mat_c_double(matvar_t* data) {
 	return matvar_t_to_pdl(data, PDL_D);
+}
+
+SV* process_mat_c_single(matvar_t* data) {
+	return matvar_t_to_pdl(data, PDL_F);
 }
 
 SV* process_mat_c_uint8(matvar_t* data) {
