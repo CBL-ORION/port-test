@@ -24,14 +24,7 @@ sub import {
 	memoize('ORION::matlab_functions');
 }
 
-sub build_function_comparisons {
-	my $matlab_functions_by_name = {
-		map { ( $_->name => $_ ) }
-		@{ ORION->matlab_functions } };
-	my $c_functions_by_name = {
-		map { ( $_->name => $_ ) }
-		@{ ORION->c_functions } };
-
+sub get_function_names_from_function_state_data {
 	my $debug_trace_dir = ORION->function_state_dir;
 	my $mat_file_rule = Path::Iterator::Rule->new
 		->file->name( qr/F_BEGIN.*\.mat$/ );
@@ -44,10 +37,22 @@ sub build_function_comparisons {
 		my $f_name = ( path($mat_file)->basename =~ /^([^.]+)/ )[0];
 		$function_names->{$f_name} = 1;
 	}
+	return [ keys %$function_names ];
+}
+
+sub build_function_comparisons {
+	my $matlab_functions_by_name = {
+		map { ( $_->name => $_ ) }
+		@{ ORION->matlab_functions } };
+	my $c_functions_by_name = {
+		map { ( $_->name => $_ ) }
+		@{ ORION->c_functions } };
+
+	my $function_names = ORION->get_function_names_from_function_state_data;
 
 	my $function_compare_by_name = {};
 	my $m_func_not_matched;
-	for my $m_func_name (keys %$function_names) {
+	for my $m_func_name (@$function_names) {
 		my $c_func_name = "orion_$m_func_name";
 		if( exists $c_functions_by_name->{$c_func_name} ) {
 			$function_compare_by_name->{$m_func_name} =
