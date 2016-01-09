@@ -5,7 +5,7 @@ use warnings;
 
 use v5.14;
 use PDL;
-use Statistics::NiceR;
+#use Statistics::NiceR;
 
 sub compare_volume_inf_norm {
 	my %args = @_;
@@ -51,12 +51,11 @@ sub histogram_similarity_intersection {
 sub histogram_similarity_emd {
 	my ($ha, $hb) = @_;
 	# TODO calculate the earth mover's distance between the histograms
-	state $r;
-	if( not defined $r ) {
-		$r = Statistics::NiceR->new;
-		$r->library('emdist');
-	}
-
+	#state $r;
+	#if( not defined $r ) {
+		#$r = Statistics::NiceR->new;
+		#$r->library('emdist');
+	#}
 	#$r->emd($ha, $hb);
 }
 
