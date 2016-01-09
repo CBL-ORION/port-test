@@ -3,7 +3,7 @@ package ORION::Compare;
 use strict;
 use warnings;
 
-use v5.16;
+use v5.14;
 use PDL;
 use Statistics::NiceR;
 

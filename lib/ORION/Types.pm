@@ -1,6 +1,6 @@
 package ORION::Types;
 
-use v5.16;
+use v5.14;
 use strict;
 use warnings;
 
