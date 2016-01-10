@@ -110,6 +110,13 @@ sub function_state_dir {
 	my $debug_trace_dir = ORION->datadir->child(qw(debug-trace));
 }
 
+sub stack_traces_path {
+	my $stack_trace_path = ORION->function_state_dir->child('stack-traces.yml');
+}
+
+sub call_graph_path {
+	my $stack_trace_path = ORION->function_state_dir->child('call-graph.yml');
+}
 
 sub Inline {
 	return unless $_[-1]  eq 'C';

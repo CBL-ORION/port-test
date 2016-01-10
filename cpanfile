@@ -13,6 +13,7 @@ requires 'Inline::C', '0.64';
 requires 'Hash::Merge';
 requires 'Type::Tiny';
 requires 'Statistics::NiceR';
+requires 'Tree::Simple';
 
 # for parsing functions
 requires 'Path::Tiny';

@@ -7,17 +7,15 @@ use v5.16;
 use lib 'lib';
 use ORION;
 use ORION::FunctionCompare;
+use ORION::FunctionStateFile;
 use YAML::XS qw(LoadFile DumpFile);
 use Log::Log4perl qw(:easy);
+use Tree::Simple;
 
 sub main {
 	Log::Log4perl->easy_init($DEBUG);
 	process_function_states_and_dump_stack_traces();
-	#build_call_graph();
-}
-
-sub stack_traces_path {
-	my $stack_trace_path = ORION->function_state_dir->child('stack-traces.yml');
+	build_call_graph();
 }
 
 sub process_function_states_and_dump_stack_traces {
@@ -30,7 +28,7 @@ sub process_function_states_and_dump_stack_traces {
 	} @$m_func_names;
 
 	my $stack_traces;
-	my $stack_trace_path = stack_traces_path();
+	my $stack_trace_path = ORION->stack_traces_path();
 
 	if( -r $stack_trace_path ) {
 		$stack_traces = LoadFile( $stack_trace_path );
@@ -59,10 +57,36 @@ sub process_function_states_and_dump_stack_traces {
 }
 
 sub build_call_graph {
-	my $stack_trace_path = stack_trace_path();
+	my $stack_trace_path = ORION->stack_traces_path();
 	my $stack_traces = LoadFile( $stack_trace_path );
 
-	...
+	INFO "Constructing call graph nodes (as a tree of stack frames)";
+	my $tree_nodes = { map {
+		my $fs = ORION::FunctionStateFile->new(
+			directory => $stack_traces->{$_}{directory},
+			name => $stack_traces->{$_}{name},
+			stack_id => $stack_traces->{$_}{stack_id},
+		);
+		($_ => Tree::Simple->new( $fs ));
+	} keys %$stack_traces };
+
+	INFO "Walking the tree of stack frames to set up parent-child relationships";
+	my $root_node;
+	for my $st_key (keys %$stack_traces) {
+		my $st_trace = $stack_traces->{$st_key}{stack_trace};
+		my $st_node = $tree_nodes->{$st_key};
+		if( @$st_trace >= 2 ) {
+			my $parent_key = $st_trace->[-2]{id};
+			$tree_nodes->{$parent_key}->addChild($st_node);
+		} else {
+			# this is the root node
+			$root_node = $st_node;
+		}
+	}
+
+	INFO "Saving call graph data";
+	my $call_graph_path = ORION->call_graph_path();
+	DumpFile( $call_graph_path, $root_node );
 }
 
 
