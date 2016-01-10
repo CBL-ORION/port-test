@@ -13,15 +13,60 @@ use ORION::C::Function;
 use ORION::MATLAB::Function;
 use ORION::FunctionCompare;
 use List::UtilsBy qw(sort_by);
+use List::AllUtils;
 use Memoize;
 use Log::Log4perl qw(:easy);
+use Config;
 
 use Inline;
 
 sub import {
 	_bind_c_functions();
+	_check_typemap_for_unbound_types();
 	memoize('ORION::c_functions');
 	memoize('ORION::matlab_functions');
+}
+
+sub _check_typemap_for_unbound_types {
+	require ExtUtils::Typemaps;
+
+	my $c_func = ORION->c_functions;
+	my $typemap = ExtUtils::Typemaps->new;
+
+	my @typemap_files;
+	push @typemap_files, path( $Config::Config{installprivlib}, "ExtUtils", "typemap" );
+	push @typemap_files, @{ ORION->Inline('C')->{TYPEMAPS} };
+
+	for my $tm (@typemap_files) {
+		my $tm_clean = path($tm)->slurp_utf8;
+		if( $tm =~ /PDL/ ) {
+			$tm_clean =~ s/^\Qpdl*\E.*//m;
+			$tm_clean =~ s/^\Qpdl_trans*\E.*//m;
+			$tm_clean =~ s/^\Qfloat\E.*//m;
+		}
+		my $new_tm = ExtUtils::Typemaps->new( string => $tm_clean );
+		$typemap->merge( typemap => $new_tm );
+	}
+
+	my %ctypes = map { $_ => 1 } $typemap->list_mapped_ctypes;
+	my %unmapped_ctypes;
+
+	for my $f (@$c_func) {
+		my @types;
+		push @types, map { $_->type->decl } @{ $f->params };
+		push @types, $f->return_type->decl;
+		for my $type (@types) {
+			unless(exists $ctypes{$type}) {
+				$unmapped_ctypes{$type} = 1;
+			}
+		}
+	}
+	delete $unmapped_ctypes{'...'}; # not an actual type
+	delete $unmapped_ctypes{'void'}; # not an actual type
+
+	use DDP; p %unmapped_ctypes;
+
+	[ keys %unmapped_ctypes ];
 }
 
 sub get_function_names_from_function_state_data {

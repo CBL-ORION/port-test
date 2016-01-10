@@ -2,6 +2,7 @@ requires 'Test::Most';
 requires 'Data::Printer'; # needed to dump output .mat file contents
 requires 'Capture::Tiny';
 requires 'List::UtilsBy';
+requires 'List::AllUtils';
 requires 'Memoize';
 requires 'Log::Log4perl';
 requires 'YAML::XS';
@@ -19,6 +20,7 @@ requires 'Tree::Simple';
 requires 'Path::Tiny';
 requires 'Path::Iterator::Rule';
 requires 'Parse::RecDescent';
+requires 'ExtUtils::Typemaps';
 
 # needed for handling MATLAB debugger
 requires 'Expect';
