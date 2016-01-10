@@ -90,7 +90,7 @@ sub compare_state {
 	if( scalar keys %$matlab_output_values ) {
 		my ($output_name) = keys %$matlab_output_values;
 		$expected_c_output = $matlab_output_values->{$output_name};
-		use DDP; p $expected_c_output;
+		#use DDP; p $expected_c_output;
 	} else {
 		LOGDIE("Do not know which outputs to compare for "
 			."MATLAB function @{[ $m->name ]}: "

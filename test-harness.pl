@@ -16,13 +16,19 @@ sub main {
 	#compare_all_function_states( $function_compare_by_name->{hdaf} );
 }
 
-sub compare_all_function_states {
+sub compare_function_states_for_function {
 	my ($f_compare) = @_;
 
 	my $all_data = $f_compare->function_states;
+	my $diffs = {};
 	for my $function_data (@$all_data) {
-		$f_compare->compare_state( $function_data );
+		INFO "Comparing @{[ $f_compare->c_function->name ]}.@{[ $function_data->stack_id ]}";
+		$diffs->{$function_data->stack_id}{diff} = $f_compare->compare_state( $function_data );
+		$diffs->{$function_data->stack_id}{state} = $function_data;
+		$function_data->clear_data;
 	}
+
+	$diffs;
 }
 
 main;
