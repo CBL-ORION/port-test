@@ -40,7 +40,7 @@ sub compare_state {
 	my $c = $self->c_function;
 
 	my $mapping = $ORION::FunctionCompareData::MAPPING->{$m->name};
-	my %map_c_to_m = reverse %{ $mapping->{param_map} };
+	my %map_c_to_m = reverse %{ $mapping->{param_map} // {} };
 	my $c_params = $c->params;
 	my $m_params_by_name = { map { $_->name => $_ } @{ $m->params } };
 
