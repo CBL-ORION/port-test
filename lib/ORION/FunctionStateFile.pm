@@ -11,11 +11,19 @@ has [ qw(directory) ] => ( is => 'ro', required => 1 );
 has [ qw(name stack_id) ] => ( is => 'rw', required => 1 );
 
 has [ qw(_input_file _output_file) ] => ( is => 'lazy' );
-has [ qw(_input_data _output_data) ] => ( is => 'lazy' );
+has [ qw(_input_data _output_data) ] => ( is => 'lazy', clearer => 1 );
 
 has [ qw(start_time stop_time stack_trace) ] => ( is => 'lazy' );
 
-has [ qw(input output) ] => ( is => 'lazy' );
+has [ qw(input output) ] => ( is => 'lazy', clearer => 1 );
+
+sub clear_data {
+	my ($self) = @_;
+	$self->clear_input;
+	$self->_clear_input_data;
+	$self->clear_output;
+	$self->_clear_output_data;
+}
 
 sub _build__input_file {
 	my ($self) = @_;
