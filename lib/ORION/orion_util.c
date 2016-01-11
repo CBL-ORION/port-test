@@ -72,4 +72,44 @@ void ndarray3_to_pdl(ndarray3* var, SV* arg) {
 	ndarray3_free(var);
 }
 
+array_float* pdl_to_array_float(SV* arg) {
+	pdl* p_in = PDL->SvPDLV(arg);
+
+	if( PDL_F != p_in->datatype )
+		croak("Can not use typemap! PDL does not contain float data (datatype: %d)", p_in->datatype);
+	if( 1 != p_in->ndims )
+		croak("Can not use PDL data! The input is not rank 1 (rank: %d)", p_in->ndims);
+
+	size_t len = p_in->dims[0];
+	float* data = (float*)(p_in->data);
+
+	array_float* var = array_new_float(len);
+
+	for( int i = 0; i < len; i++ ) {
+		array_add_float( var, data[i]);
+	}
+
+	SAVEDESTRUCTOR(array_free_float, var);
+
+	return var;
+}
+
+void array_float_to_pdl(array_float* var, SV* arg) {
+	size_t len = array_length_float(var);
+	size_t dim[] = { len };
+
+	pdl* p_out = PDL->pdlnew();
+	PDL->setdims(p_out, dim, 1); /* rank 1 */
+	p_out->datatype = PDL_F; /* using float (pixel_type) for storage */
+	PDL->allocdata(p_out);
+
+	float* data = (float*)(p_out->data);
+	for( size_t i = 0; i < len; i++ ) {
+		data[i] = array_get_float( var, i );
+	}
+
+
+	PDL->SetSV_PDL(arg,p_out);
+}
+
 #endif /* PERL_ORION_UTIL_H */

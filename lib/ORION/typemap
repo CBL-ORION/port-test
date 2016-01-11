@@ -2,40 +2,34 @@ TYPEMAP
 
 ndarray3* T_NDARRAY3
 orion_Makefilter_flag T_ENUM
-
-# array_float *
-# array_float **
-# array_int *
-# array_int **
-# array_orion_eig_feat_result *
-# array_str *
-# const float64 *
-# const ndarray3 * T_NDARRAY3
-# float *
+const ndarray3 * T_NDARRAY3
 float64 T_NV
-# float64 *
-# ndarray3_complex *
-# orion_eigenvalue_feature_method
-# orion_eig_feat_result *
-# orion_filepath *
-# orion_io_param *
-# orion_mhd_datatype
-# orion_mhd_metadata *
-# orion_multiscale_laplacian_output *
-# orion_segmentation_param *
-# orion3_param *
-# pixel_type
-# pixel_type *
-# size_t *
-# uint8_t
-# vector_float *
+
+array_float * T_ARRAY_FLOAT
+array_orion_eig_feat_result *  T_ARRAY_ORION_EIG_FEAT_RESULT
+vector_float * T_VECTOR_FLOAT
+
+orion_eigenvalue_feature_method  T_ENUM
+
+orion_multiscale_laplacian_output * T_PTROBJ
+ORION::Type::Multiscale::Laplacian::Output T_PTROBJ
+
+orion_segmentation_param * T_PTROBJ
+ORION::Type::Multiscale::Laplacian::Output
+
 
 INPUT
 
 T_NDARRAY3
 	$var = pdl_to_ndarray3($arg);
 
+T_ARRAY_FLOAT
+	$var = pdl_to_array_float($arg);
+
 OUTPUT
 
 T_NDARRAY3
 	ndarray3_to_pdl($var, $arg);
+
+T_ARRAY_FLOAT
+	array_float_to_pdl($var, $arg);
