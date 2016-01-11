@@ -157,9 +157,9 @@ SV* matvar_t_to_pdl(matvar_t* data, int datatype) {
 	if( data->isLogical ) {
 		HV* p_h;
 		if( !p->hdrsv ) {
-			p->hdrsv = newRV((SV*)newHV());
+			p->hdrsv = (SV*)newRV((SV*)newHV());
 		}
-		p_h = SvRV((SV*)(p->hdrsv));
+		p_h = (HV*)SvRV((SV*)(p->hdrsv));
 
 		hv_stores( p_h, "logical", newSViv( !!( data->isLogical ) ));
 	}

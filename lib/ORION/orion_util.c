@@ -40,8 +40,8 @@ ndarray3* pdl_to_ndarray3(SV* arg) {
 void ndarray3_to_pdl(ndarray3* var, SV* arg) {
 	/* need to wrap ndarray3 data field in a PDL structure -> SV* */
 	pdl* p_out = PDL->pdlnew();
-	PDL->setdims(p_out, ((ndarray3*)var)->sz, 3); /* rank 3 */
-	p_out->data = ((ndarray3*)var)->p; /* point at the ndarray3 data */
+	PDL->setdims(p_out, var->sz, 3); /* rank 3 */
+	p_out->data = var->p; /* point at the ndarray3 data */
 	p_out->datasv = newSVuv(PTR2UV(p_out->data)); /* need a datasv so it can be free'd later */
 	p_out->datatype = PDL_F; /* using float (pixel_type) for storage */
 
@@ -49,17 +49,17 @@ void ndarray3_to_pdl(ndarray3* var, SV* arg) {
 	p_out->state |= PDL_ALLOCATED;
 
 	/* if has_spacing, need to set key in PDL header */
-	if( ((ndarray3*)var)->has_spacing ) {
+	if( var->has_spacing ) {
 		HV* p_out_hv;
 		if( !p_out->hdrsv ) {
-			p_out->hdrsv = newRV((SV*)newHV());
+			p_out->hdrsv = (SV*)newRV((SV*)newHV());
 		}
 
-		p_out_hv = SvRV((SV*)(p_out->hdrsv));
+		p_out_hv = (HV*)SvRV((SV*)(p_out->hdrsv));
 
 		AV* spacing_av = (AV*)sv_2mortal((SV*)newAV());
 		for( int dim_idx = 0; dim_idx < PIXEL_NDIMS; dim_idx++ ) {
-			av_push(spacing_av, newSVnv(  ((ndarray3*)var)->spacing[dim_idx]  ) );
+			av_push(spacing_av, newSVnv(  var->spacing[dim_idx]  ) );
 		}
 
 		hv_stores( p_out_hv, "spacing", newRV((SV*) spacing_av ));
@@ -68,8 +68,8 @@ void ndarray3_to_pdl(ndarray3* var, SV* arg) {
 	PDL->SetSV_PDL(arg,p_out);
 
 	/* set wrap to true and free --- ndarray3* no longer owns data */
-	((ndarray3*)var)->wrap = true;
-	ndarray3_free(((ndarray3*)var));
+	var->wrap = true;
+	ndarray3_free(var);
 }
 
 #endif /* PERL_ORION_UTIL_H */
