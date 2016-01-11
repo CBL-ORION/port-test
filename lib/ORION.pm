@@ -57,7 +57,7 @@ sub _check_typemap_for_unbound_types {
 		push @types, $f->return_type->decl;
 		for my $type (@types) {
 			unless(exists $ctypes{$type}) {
-				$unmapped_ctypes{$type} = 1;
+				push @{ $unmapped_ctypes{$type} }, $f->name;
 			}
 		}
 	}
