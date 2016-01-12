@@ -43,6 +43,8 @@ sub compare_state {
 	my %map_c_to_m = reverse %{ $mapping->{param_map} // {} };
 	my $c_params = $c->params;
 	my $m_params_by_name = { map { $_->name => $_ } @{ $m->params } };
+	my $inject_c_params = $mapping->{inject} // sub { +{} };
+	my $injected_c_params = $inject_c_params->( $fs );
 
 	# list of MATLAB input parameters that match the order of the C input parameters
 	my @ordinal_map_m_to_c = ();
@@ -63,6 +65,8 @@ sub compare_state {
 			# look up mapping of C parameter name to MATLAB
 			# parameter name
 			$add_matlab_param->( $map_c_to_m{$c_param->name} );
+		} elsif( exists $injected_c_params->{$c_param->name} ) {
+			$add_matlab_param->( $c_param->name );
 		} elsif( exists $m_params_by_name->{$c_param->name} ) {
 			# if the MATLAB parameters have the same name as the C parameter
 			$add_matlab_param->( $m_params_by_name->{$c_param->name}->name );
@@ -72,13 +76,14 @@ sub compare_state {
 	}
 
 	my $matlab_input_values = $fs->input;
+	my $all_input_values = { %$injected_c_params, %$matlab_input_values };
 	my $matlab_output_values = $fs->output;
 
 	my $c_input_values = [
 		map {
 			ORION::Types->coerce_type(
 				$c_params->[$_]->type,
-				$matlab_input_values->{$ordinal_map_m_to_c[$_]})
+				$all_input_values->{$ordinal_map_m_to_c[$_]})
 		} 0..@$c_params-1 ];
 
 	#use DDP; p $m->params;
