@@ -19,7 +19,7 @@ ok( expected_ndarray3($n_got), 'expected round-trip back to ndarray3' );
 __DATA__
 __C__
 
-#include "ndarray/ndarray3.h"
+#include "orion_util.c"
 
 ndarray3* get_sequence() {
 	ndarray3* n = ndarray3_new(3, 4, 5);

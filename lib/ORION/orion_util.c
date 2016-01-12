@@ -1,6 +1,11 @@
 #ifndef PERL_ORION_UTIL_H
 #define PERL_ORION_UTIL_H 1
 
+#include "ndarray/ndarray3.h"
+#include "container/array.h"
+#include "container/vector.h"
+
+
 ndarray3* pdl_to_ndarray3(SV* arg) {
 	ndarray3* var; /* return value */
 
