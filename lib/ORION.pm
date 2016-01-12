@@ -119,8 +119,59 @@ sub build_function_comparisons {
 sub _bind_c_functions {
 	my @c_funcs = sort_by { $_->name } @{ ORION->c_functions };
 	my $protos = join "\n", map { $_->prototype } @c_funcs;
+	my $headers = <<'C';
+#include <assert.h>
+#include <complex.h>
+#include <errno.h>
+#include <float.h>
+#include <math.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-	Inline->bind( C => $protos,
+typedef bool DONE_WITH_STDINC;
+
+#include "ndarray/ndarray3.h"
+#include "ndarray/ndarray3_complex.h"
+
+#include "container/array.h"
+#include "container/vector.h"
+
+#include "param/segmentation.h"
+#include "param/io.h"
+#include "param/orion3.h"
+
+#include "io/path/path.h"
+#include "io/format/mhd.h"
+
+#include "kitchen-sink/01_Segmentation/dendrites_main/ExtractFeatures/computeEigenvaluesGaussianFilter.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/IsotropicFilter/Makefilter.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/multiscaleLaplacianFilter.h"
+
+
+#include "orion_util.c"
+
+C
+
+	Inline->bind( C => "$headers\n\n",#"$protos",
+		FILTERS => [
+			'Preprocess',
+			sub {
+				# remove bits before orion library
+				shift =~ s|\A.*DONE_WITH_STDINC.*?$||gsmr;
+			},
+			sub {
+				# remove preprocessor output
+				shift =~ s|^#.*$||gmr;
+			},
+			#sub { use DDP; my $c = shift; p $c; $c },
+			],
+		enable => structs =>,
 		ENABLE => AUTOWRAP =>
 		with => [ 'ORION' ] );
 }
@@ -173,28 +224,11 @@ sub Inline {
 	# when merging
 	my $config = {
 		AUTO_INCLUDE => [ <<C ],
-#include "ndarray/ndarray3.h"
-#include "ndarray/ndarray3_complex.h"
-
-#include "container/array.h"
-#include "container/vector.h"
-
-#include "param/segmentation.h"
-#include "param/io.h"
-#include "param/orion3.h"
-
-#include "io/path/path.h"
-#include "io/format/mhd.h"
-
-#include "kitchen-sink/01_Segmentation/dendrites_main/ExtractFeatures/computeEigenvaluesGaussianFilter.h"
-#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/IsotropicFilter/Makefilter.h"
-#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/multiscaleLaplacianFilter.h"
-
-#include "orion_util.c"
 C
 		INC => [
 			"-std=c99",
 			"-I@{[ oriondir()->child('lib') ]}",
+			"-I@{[ oriondir()->child('lib', 'param') ]}",
 			"-I@{[ path(__FILE__)->absolute->parent->child( qw{ORION} ) ]}",
 		],
 		LIBS => [ "-L@{[ oriondir()->child( qw{.build .lib} ) ]} -lorion" ],

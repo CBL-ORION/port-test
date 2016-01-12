@@ -15,6 +15,8 @@ requires 'Hash::Merge';
 requires 'Type::Tiny';
 requires 'Statistics::NiceR';
 requires 'Tree::Simple';
+requires 'Inline::Struct';
+requires 'Inline::Filters';
 
 # for parsing functions
 requires 'Path::Tiny';
