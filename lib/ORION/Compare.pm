@@ -56,7 +56,6 @@ sub histogram_similarity_emd {
 		#$r = Statistics::NiceR->new;
 		#$r->library('emdist');
 	#}
-	#$r->emd($ha, $hb);
 }
 
 sub histogram_similarity_on_bin_centres {

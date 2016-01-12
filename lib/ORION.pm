@@ -19,10 +19,12 @@ use Log::Log4perl qw(:easy);
 use Config;
 
 use Inline;
+use Inline::Struct;
+use Inline::Filters;
 
 sub import {
 	_bind_c_functions();
-	_check_typemap_for_unbound_types();
+	#_check_typemap_for_unbound_types();
 	memoize('ORION::c_functions');
 	memoize('ORION::matlab_functions');
 }
@@ -212,6 +214,10 @@ sub stack_traces_path {
 
 sub call_graph_path {
 	my $stack_trace_path = ORION->function_state_dir->child('call-graph.yml');
+}
+
+sub diff_path {
+	my $stack_trace_path = ORION->function_state_dir->child('diff.yml');
 }
 
 sub Inline {
