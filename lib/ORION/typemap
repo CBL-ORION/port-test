@@ -4,6 +4,8 @@ ndarray3* T_NDARRAY3
 orion_Makefilter_flag T_ENUM
 const ndarray3 * T_NDARRAY3
 float64 T_DOUBLE
+float T_FLOAT
+int T_IV
 
 uint8_t T_U_CHAR
 uint32_t T_U_INT
