@@ -110,7 +110,7 @@ sub compare_state {
 		if( defined &$c_func_perl ) {
 			$got_c_output = &$c_func_perl( @$c_input_values );
 		} else {
-			LOGWARN("The C function $c_func_name was not bound to Perl at $c_func_perl");
+			LOGDIE("The C function $c_func_name was not bound to Perl at $c_func_perl");
 			return;
 		}
 	}
