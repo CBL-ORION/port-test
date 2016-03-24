@@ -28,9 +28,13 @@ sub coerce_type {
 		when('orion_segmentation_param *') {
 			$data = $data->[0];
 			my $s = Inline::Struct::orion_segmentation_param->new();
-			$s->scales( $data->{sigma}->float->squeeze );
-			$s->multiscale( $s->scales->nelem > 1 );
-			$s->number_of_stacks( $data->{n_stacks}->indx->sclr  );
+			if( exists $data->{sigma} ) {
+				$s->scales( $data->{sigma}->float->squeeze );
+				$s->multiscale( $s->scales->nelem > 1 );
+			}
+			$s->number_of_stacks(
+				$data->{n_stacks}->indx->sclr
+			) if exists $data->{n_stacks};
 
 			$s->ORION::orion_segmentation_param_set_training(
 				$data->{training}->squeeze
