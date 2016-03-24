@@ -1,3 +1,4 @@
+requires 'Modern::Perl';
 requires 'Test::Most';
 requires 'Data::Printer'; # needed to dump output .mat file contents
 requires 'Capture::Tiny';

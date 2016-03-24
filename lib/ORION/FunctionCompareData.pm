@@ -3,6 +3,7 @@ package ORION::FunctionCompareData;
 use strict;
 use warnings;
 
+use Modern::Perl;
 use ORION::Compare;
 use Path::Tiny;
 
