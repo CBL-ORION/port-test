@@ -4,6 +4,10 @@ otrace('external/orion3mat');
 hdaf(3, 5, rand(3,3))
 dump_state('.'), dbcont
 
+sed -i~ 's,^test-data/DIADEM/NPF,orion/&,' orion/test-data/DIADEM/NPF/Input_NPF023_D.txt
+external/orionmat/01_Segmentation/dendrites_main/settingDefaultParameters.m
+	; -    p.delete_files = true;
+	; +    p.delete_files = false;
 
 cd ~/r/code/orion/port-test
 !cd ~/r/code/orion/port-test/orion && make test-data/DIADEM/NPF/NPF023/NPF023.raw
@@ -19,3 +23,5 @@ matlab -nodesktop -nosplash -nodisplay -r "addpath('src/matlab'), otrace('extern
 ./call-graph-from-trace.pl
 
 ./test-harness.pl
+rm -Rfv _Inline/; ( export CFLAGS="$CFLAGS -fPIC"; cd orion && make clean dep.external all PROD=1 BUILD_ENABLE_ASAN=0 ) && ./test-harness.pl
+( export CFLAGS="$CFLAGS -fPIC"; cd orion && make all PROD=1 BUILD_ENABLE_ASAN=0 ) && ./test-harness.pl
