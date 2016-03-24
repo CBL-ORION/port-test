@@ -4,10 +4,16 @@ use v5.14;
 use strict;
 use warnings;
 
+use Modern::Perl;
 use PDL;
+use Log::Log4perl qw(:easy);
 
 sub coerce_type {
 	my ($class, $type, $data) = @_;
+	if( $type->is_ptr and not defined $data ) {
+		LOGWARN("Data is not defined (type: @{[ $type->unqualified_type ]})");
+		return undef;
+	}
 	given( $type->unqualified_type ) {
 		when('size_t') { long($data)->squeeze }
 		when('int') { long($data)->squeeze }
