@@ -154,7 +154,12 @@ typedef bool DONE_WITH_STDINC;
 #include "kitchen-sink/01_Segmentation/dendrites_main/ExtractFeatures/computeEigenvaluesGaussianFilter.h"
 #include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/IsotropicFilter/Makefilter.h"
 #include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/multiscaleLaplacianFilter.h"
-
+#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/IsotropicFilter/hdaf.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/ExtractFeatures/getFeatures.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/settingDefaultParameters.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/readNegativeSamples.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/ORION3_Dendrites.h"
+#include "kitchen-sink/01_Segmentation/dendrites_main/ExtractFeatures/computeFeatures.h"
 
 #include "orion_util.c"
 
