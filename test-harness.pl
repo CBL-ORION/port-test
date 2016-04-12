@@ -5,37 +5,84 @@ use warnings;
 
 use v5.16;
 use lib 'lib';
-use PDL;
-use Data::MATLAB;
 use ORION;
+use YAML::XS qw(LoadFile DumpFile);
+use Log::Log4perl qw(:easy);
 
-#use Inline Config =>
-	#enable => force_build =>
-	#enable => build_noisy =>
-	#disable => clean_after_build =>;
+sub main {
+	Log::Log4perl->easy_init($DEBUG);
 
-use Inline C => 'DATA',
-	ENABLE => AUTOWRAP =>
-	with => ['ORION'],
-	;
+	compare_function_states();
 
-my $p = Data::MATLAB->read_data( '../orion/test.mat.v7' );
-use DDP; p $p;
+	#my $fss = $function_compare_by_name->{hdaf}->function_states;
+	#my $d = compare_function_states_for_function( $function_compare_by_name->{Makefilter} );
+	#use DDP; p $d;
+	#use DDP; p $function_compare_by_name->{hdaf}->function_states->[0]->input;
+	#my $d = compare_function_states_for_function( $function_compare_by_name->{hdaf} );
+	#use DDP; p $d;
+}
 
-my $SZ = 5;
-my $factor = 0.25;
-my $nd = ndcoords(float, $SZ-1,$SZ,$SZ+1);
-#my $q = orion_hdaf(3, 5, sequence(float, 5,5,5));
-my $q = orion_hdaf(3, 5, (( 0.25* $nd)**2)->sumover->sqrt->float );
-use DDP; p $q;
+sub traverse_call_graph {
+	my $call_graph_path = ORION->call_graph_path;
+	die "Need to generate call graph first. Please run ./call-graph-from-trace.pl"
+		unless -r $call_graph_path;
+	my $root_node = LoadFile( $call_graph_path );
 
-__DATA__
-__C__
+	use DDP; p $root_node;
 
-#include "ndarray/ndarray3.h"
-/*#include "kitchen-sink/01_Segmentation/dendrites_main/DetectTrainingSet/IsotropicFilter/hdaf.h"*/
+	# Steps:
+	#
+	# 1. Traverse the tree until you get to the leaf node.
+	# 2. Compare the
+	# 3. Make note of functions that either read or write to disks (grep fopen)
+	#    R: getInfoVolume, VolCrop2, readSWC readinformationOR3 RAWfromMHD
+	#    W: createAvizoVisualization, exportAmiraRegistrationParameters SWCtoVTK SWCtoVTKSurface createVisualizationFromSWC writeSWC
+        #       createInputFileDIADEM3 createInputFileDIADEM4 createInputFileDIADEM4 createInputFileDIADEM5 createInputFileDIADEM5 getReconstructionTime manual_threshold_segmentation_GUI
+        #       WriteRAWandMHD
+	#
+	#    These
 
-extern ndarray3* orion_hdaf(
-		int hdaf_approx_degree,
-		float scaling_constant,
-		ndarray3* x);
+}
+
+sub compare_function_states {
+	my $function_compare_by_name = ORION->build_function_comparisons();
+
+	#delete $function_compare_by_name->{ORION3_Dendrites};
+	use DDP; p $function_compare_by_name;
+
+	my $diff_path = ORION->diff_path;
+	my $diff_data;
+	if( -r $diff_path ) {
+		$diff_data = LoadFile( $diff_path );
+	}
+
+	for my $f_compare (values %$function_compare_by_name) {
+		my $m_name = $f_compare->matlab_function->name;
+
+		next if exists $diff_data->{$m_name};
+
+		INFO "Running comparison on states of $m_name";
+		my $diff = compare_function_states_for_function($f_compare);
+
+		$diff_data->{$m_name} = $diff;
+
+		DumpFile( $diff_path, $diff_data );
+	}
+}
+
+sub compare_function_states_for_function {
+	my ($f_compare) = @_;
+
+	my $all_data = $f_compare->function_states;
+	my $diffs = {};
+	for my $function_data (@$all_data) {
+		INFO "Comparing @{[ $f_compare->matlab_function->name ]}.@{[ $function_data->stack_id ]}";
+		$diffs->{$function_data->stack_id}{diff} = $f_compare->compare_state( $function_data );
+		$diffs->{$function_data->stack_id}{state} = $function_data;
+		$function_data->clear_data;
+	}
+
+	$diffs;
+}
+
+main;

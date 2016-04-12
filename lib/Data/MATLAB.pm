@@ -36,7 +36,9 @@ size_t matio_nelems(matvar_t* data);
 SV* process_matvar( matvar_t* data );
 SV* process_mat_t_struct(matvar_t* data);
 SV* process_mat_c_double(matvar_t* data);
+SV* process_mat_c_single(matvar_t* data);
 SV* process_mat_c_uint8(matvar_t* data);
+SV* process_mat_c_uint16(matvar_t* data);
 SV* process_mat_c_char(matvar_t* data);
 
 SV* read_data(SV* self, char* filename ) {
@@ -67,6 +69,10 @@ SV* read_data(SV* self, char* filename ) {
 SV* process_matvar( matvar_t* data ) {
 	/*[>DEBUG<]matio_dump_info(data);*/
 	/* switch over `enum matio_classes` */
+	if( data->isComplex ) {
+		croak("Do not know how to handle complex data: name: %s class: %s",
+			data->name, matio_class_to_char(data->class_type));
+	}
 	switch( data->class_type ) {
 		case MAT_C_EMPTY:     return process_unimplemented(data);
 		case MAT_C_CELL:      return process_mat_t_cell(data);
@@ -75,11 +81,11 @@ SV* process_matvar( matvar_t* data ) {
 		case MAT_C_CHAR:      return process_mat_c_char(data);
 		case MAT_C_SPARSE:    return process_unimplemented(data);
 		case MAT_C_DOUBLE:    return process_mat_c_double(data);
-		case MAT_C_SINGLE:    return process_unimplemented(data);
+		case MAT_C_SINGLE:    return process_mat_c_single(data);
 		case MAT_C_INT8:      return process_unimplemented(data);
 		case MAT_C_UINT8:     return process_mat_c_uint8(data);
 		case MAT_C_INT16:     return process_unimplemented(data);
-		case MAT_C_UINT16:    return process_unimplemented(data);
+		case MAT_C_UINT16:    return process_mat_c_uint16(data);
 		case MAT_C_INT32:     return process_unimplemented(data);
 		case MAT_C_UINT32:    return process_unimplemented(data);
 		case MAT_C_INT64:     return process_unimplemented(data);
@@ -148,6 +154,16 @@ SV* matvar_t_to_pdl(matvar_t* data, int datatype) {
 	PDL->allocdata(p);
 	memcpy(p->data, data->data, data->nbytes);
 
+	if( data->isLogical ) {
+		HV* p_h;
+		if( !p->hdrsv ) {
+			p->hdrsv = (SV*)newRV((SV*)newHV());
+		}
+		p_h = (HV*)SvRV((SV*)(p->hdrsv));
+
+		hv_stores( p_h, "logical", newSViv( !!( data->isLogical ) ));
+	}
+
 	/* store in SV */
 	rv = newSV(0);
 	PDL->SetSV_PDL(rv, p);
@@ -160,11 +176,17 @@ SV* process_mat_c_double(matvar_t* data) {
 	return matvar_t_to_pdl(data, PDL_D);
 }
 
+SV* process_mat_c_single(matvar_t* data) {
+	return matvar_t_to_pdl(data, PDL_F);
+}
+
 SV* process_mat_c_uint8(matvar_t* data) {
 	return matvar_t_to_pdl(data, PDL_B);
 }
 
-
+SV* process_mat_c_uint16(matvar_t* data) {
+	return matvar_t_to_pdl(data, PDL_US);
+}
 
 SV* process_mat_c_char(matvar_t* data) {
 	SV* rv;

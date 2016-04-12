@@ -1,5 +1,8 @@
 use Test::Most;
 
+use strict;
+use warnings;
+
 use ORION;
 
 if(not ORION->orionmatdir->exists) {
@@ -8,9 +11,11 @@ if(not ORION->orionmatdir->exists) {
 
 plan tests => 1;
 
-ORION->c_functions;
+my $c_functions = ORION->c_functions;
+#use DDP  { class => { expand => 'all' } }; p $c_functions ;
 
-#ORION->matlab_functions;
+my $m_functions = ORION->matlab_functions;
+use DDP  { class => { expand => 'all' } }; p $m_functions ;
 
 ok(1);
 
